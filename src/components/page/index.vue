@@ -362,6 +362,8 @@ export default {
     padding-left: 50px;
     padding-right: 50px;
     align-items: center;
+    font-size: 20px;
+    font-weight: 500;
 }
 .alarmVolumeMes {
     display: flex;
@@ -398,6 +400,8 @@ export default {
 .alarmingTrendBySevenDay {
     border: 1px solid #000;
     height: 250px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .alarmingTrendBySevenDayMes {
     display: flex;
@@ -415,6 +419,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: #ccc;
+    color:#fff
 }
 .redColor {
     background-color: rgb(238, 33, 12);
