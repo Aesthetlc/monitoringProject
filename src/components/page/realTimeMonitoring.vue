@@ -1,27 +1,27 @@
 <template>
     <div>
-        <div class="crumbs">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 实时监控
-                </el-breadcrumb-item>
-            </el-breadcrumb>
-        </div>
         <div class="container">
-            <div class="handle-box">
-                <el-button
-                    type="primary"
-                    icon="el-icon-delete"
-                    class="handle-del mr10"
-                    @click="delAllSelection"
-                >批量删除</el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+            <div>
+                <el-form ref="form" inline :model="form" label-width="100px">
+                    <el-form-item label="摄像机ip">
+                        <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                    </el-form-item>
+                    <el-form-item label="摄像机位置">
+                        <el-input v-model="form.address" placeholder="请输入摄像机位置"></el-input>
+                    </el-form-item>
+                    <el-form-item label="报警筛选">
+                        <el-select v-model="form.warn" placeholder="筛选条件">
+                            <el-option label="警告1" value="jinggao1"></el-option>
+                            <el-option label="警告2" value="jinggao2"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
+                        <el-button @click="resetForm('ruleForm')">重置</el-button>
+                    </el-form-item>
+                </el-form>
             </div>
+            <el-button type="primary" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量关闭</el-button>
             <el-table
                 :data="tableData"
                 border
@@ -32,53 +32,36 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="用户名"></el-table-column>
-                <el-table-column label="账户余额">
-                    <template slot-scope="scope">￥{{scope.row.money}}</template>
-                </el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
+                <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
+                <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="type" label="类型" align="center"></el-table-column>
+                <el-table-column prop="warnTime" label="报警时间" align="center"></el-table-column>
+
+                <el-table-column label="缩略图" align="center">
                     <template slot-scope="scope">
-                        <el-image
-                            class="table-td-thumb"
-                            :src="scope.row.thumb"
-                            :preview-src-list="[scope.row.thumb]"
-                        ></el-image>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="address" label="地址"></el-table-column>
-                <el-table-column label="状态" align="center">
-                    <template slot-scope="scope">
-                        <el-tag
-                            :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}</el-tag>
+                        <el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="date" label="注册时间"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button
-                            type="text"
-                            icon="el-icon-edit"
-                            @click="handleEdit(scope.$index, scope.row)"
-                        >编辑</el-button>
-                        <el-button
-                            type="text"
-                            icon="el-icon-delete"
-                            class="red"
-                            @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
+                        <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                        <el-button type="text" @click="handleDelete(scope.$index, scope.row)"
+                            >关闭</el-button
+                        >
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination">
                 <el-pagination
                     background
-                    layout="total, prev, pager, next"
-                    :current-page="query.pageIndex"
-                    :page-size="query.pageSize"
-                    :total="pageTotal"
+                    :page-sizes="[5, 10, 15, 20]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :current-page="pages.limit"
+                    :page-size="pages.size"
+                    :total="pages.total"
                     @current-change="handlePageChange"
+                    @size-change="handleSizeChange"
                 ></el-pagination>
             </div>
         </div>
@@ -107,11 +90,15 @@ export default {
     name: 'realTimeMonitoring',
     data() {
         return {
-            query: {
+            form: {
+                ip: '',
                 address: '',
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
+                warn: 1
+            },
+            pages: {
+                total: 5,
+                limit: 1,
+                size: 5
             },
             tableData: [],
             multipleSelection: [],
@@ -129,15 +116,18 @@ export default {
     methods: {
         // 获取 easy-mock 的模拟数据
         getData() {
-            fetchData(this.query).then(res => {
-                console.log(res);
+            fetchData(this.form).then(res => {
                 this.tableData = res.list;
-                this.pageTotal = res.pageTotal || 50;
+                this.pages.total = res.pageTotal || 5;
             });
+        },
+        //重置表单
+        resetForm() {
+            console.log('resetForm');
         },
         // 触发搜索按钮
         handleSearch() {
-            this.$set(this.query, 'pageIndex', 1);
+            this.$set(this.pages, 'limit', 1);
             this.getData();
         },
         // 删除操作
@@ -180,7 +170,11 @@ export default {
         },
         // 分页导航
         handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
+            this.$set(this.pages, 'limit', val);
+            this.getData();
+        },
+        handleSizeChange(val) {
+            this.$set(this.pages, 'size', val);
             this.getData();
         }
     }
