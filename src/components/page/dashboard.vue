@@ -110,7 +110,7 @@
 import bus from '../common/bus';
 import Echart from '@/components/common/Echart';
 export default {
-    name: 'index',
+    name: 'dashboard',
     data() {
         return {
             echartData: {

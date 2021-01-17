@@ -48,22 +48,22 @@ export default {
             items: [
                 {
                     icon: 'el-icon-lx-home',
-                    index: 'index',
+                    index: '/home',
                     title: '系统首页'
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: 'realTimeMonitoring',
+                    index: '/home/realTimeMonitoring',
                     title: '实时监控'
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: 'alarmManagement',
+                    index: '/home/alarmManagement',
                     title: '报警管理'
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: 'policeStatistics',
+                    index: '/home/policeStatistics',
                     title: '报警统计'
                 }
             ]
@@ -71,7 +71,7 @@ export default {
     },
     computed: {
         onRoutes() {
-            return this.$route.path.replace('/', '');
+            return this.$route.path
         }
     },
     created() {
