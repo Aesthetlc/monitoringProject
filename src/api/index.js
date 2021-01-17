@@ -1,9 +1,10 @@
 import request from '../utils/request';
 
-export const fetchData = query => {
+//获取实时监控
+export function fetchData (params)  {
     return request({
         url: './table.json',
         method: 'get',
-        params: query
+        params
     });
 };
