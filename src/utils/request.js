@@ -62,7 +62,34 @@ axios.interceptors.response.use(
         }
     },
     error => {
-        console.log(error);
+        let status = error.response.status; // 获取失败的状态码
+        let message = '未知错误';
+        switch (status) {
+            case 400:
+                message = '请求参数错误';
+                break;
+            case 403:
+                message = '403 refresh_token未携带或已过期';
+                break;
+            case 507:
+                message = '服务器数据库异常';
+                break;
+            case 401:
+                message = 'token过期或未出';
+                break;
+            case 404:
+                message = '404未找到请联系管理员！';
+                break;
+            case 500:
+                message = '服务器异常，请联系管理管！';
+                break;
+            default:
+                break;
+        }
+        this.$message({
+            message: message,
+            type: 'error'
+        });
         return Promise.reject();
     }
 );
