@@ -105,7 +105,7 @@ export default {
                 ip: '',
                 address: '',
                 warn: 1,
-                time:[]
+                time: []
             },
             pages: {
                 total: 5,
@@ -127,11 +127,10 @@ export default {
     },
     methods: {
         // 获取 easy-mock 的模拟数据
-        getData() {
-            fetchData(this.form).then(res => {
-                this.tableData = res.list;
-                this.pages.total = res.pageTotal || 5;
-            });
+        async getData() {
+            let res = await fetchData(this.form);
+            this.tableData = res.list;
+            this.pages.total = res.pageTotal || 5;
         },
         //重置表单
         resetForm() {

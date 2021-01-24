@@ -46,7 +46,7 @@ export default {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     this.$message.success('登录成功');
-                    localStorage.setItem('ms_username', this.param.username);
+                    sessionStorage.setItem('ms_username', this.param.username);
                     this.$router.push('/home');
                 } else {
                     this.$message.error('请输入账号和密码');
