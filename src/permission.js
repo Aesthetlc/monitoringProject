@@ -8,7 +8,6 @@ router.beforeEach(function(to, from, next) {
     if (to.path.startsWith('/home')) {
         // 如果是'/home'==>继续判断token是否存在
         let token = window.sessionStorage.getItem('ms_username');
-        console.log(token,'token');
         token ? next() : next('/login');
     } else {
         // 不是'/home'就是'/login'

@@ -1,0 +1,20 @@
+{
+  "code": "00000",
+  "msg": "请求成功",
+  "content": "请求成功",
+  "data": {
+    "count": 880,
+    "percent": 10.0,
+    "series": [{
+        "name": "当周",
+        "type": "bar",
+        "data": [880]
+      },
+      {
+        "name": "上周",
+        "type": "bar",
+        "data": [800]
+      }
+    ]
+  }
+}

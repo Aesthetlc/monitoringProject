@@ -1,0 +1,20 @@
+{
+  "code": "00000",
+  "msg": "请求成功",
+  "content": "请求成功",
+  "data": {
+    "count": 125,
+    "percent": 12.5,
+    "series": [{
+        "name": "当日",
+        "type": "bar",
+        "data": [125]
+      },
+      {
+        "name": "上一日",
+        "type": "bar",
+        "data": [100]
+      }
+    ]
+  }
+}

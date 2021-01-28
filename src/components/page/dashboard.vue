@@ -16,9 +16,11 @@
                     <!-- 报警量 日 -->
                     <div class="alarmVolumeMes">
                         <div class="alarmVolumeMesLeft">
-                            <div class="alarmVolumeMesLeftNum">125</div>
+                            <div class="alarmVolumeMesLeftNum">{{ warnDayNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                日同比 12.5%<em style="color:red" class="el-icon-caret-top"></em>
+                                日同比 {{ warnDayPercentNum }}%
+                                <em v-if="warnDayPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartDay" class="alarmVolumeMesRight"></echart>
@@ -35,9 +37,11 @@
                     <!-- 报警量 周 -->
                     <div class="alarmVolumeMes">
                         <div class="alarmVolumeMesLeft">
-                            <div class="alarmVolumeMesLeftNum">880</div>
+                            <div class="alarmVolumeMesLeftNum">{{ warnWeekNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                周同比 10.0%<em style="color:red" class="el-icon-caret-top"></em>
+                                周同比 {{ warnWeekPercentNum }}%
+                                <em v-if="warnWeekPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartWeek" class="alarmVolumeMesRight"></echart>
@@ -80,24 +84,24 @@
                     <!-- 近7日报警趋势 -->
                     <div class="alarmVolumeTitle">
                         <div>TOP7报警量排行</div>
-                        <div>
-                            <el-radio v-model="radio" label="today"><span style="font-size:18px">今日</span></el-radio>
-                            <el-radio v-model="radio" label="seven"><span style="font-size:18px">近7日</span></el-radio>
-                        </div>
+                        <el-radio-group v-model="radio" @change="changeTopDate">
+                            <el-radio label="1"><span style="font-size:18px">今日</span></el-radio>
+                            <el-radio label="7"><span style="font-size:18px">近7日</span></el-radio>
+                        </el-radio-group>
                     </div>
                     <!-- 近7日报警趋势 -->
                     <div class="alarmingTrendBySevenDay">
-                        <div v-for="item in 7" class="alarmingTrendBySevenDayMes">
+                        <div v-for="(item, index) in topWarnDataList" class="alarmingTrendBySevenDayMes">
                             <div style="display:flex">
                                 <div
                                     class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: item == 1, pinkColor: item == 2, yellowColor: item == 3 }"
+                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
                                 >
-                                    {{ item }}
+                                    {{ index + 1 }}
                                 </div>
-                                <div>东配楼1F1A3</div>
+                                <div>{{ item.name }}</div>
                             </div>
-                            <div style="margin-right:10px">20</div>
+                            <div style="margin-right:10px">{{ item.count }}</div>
                         </div>
                     </div>
                 </el-card>
@@ -108,6 +112,13 @@
 
 <script>
 import bus from '../common/bus';
+import {
+    getAlertTrendingBySeven,
+    getAlertStatisticDaily,
+    getAlertStatisticWeek,
+    getAlertStatisticMonth,
+    getAlertTrendingTop
+} from '@/api/index.js';
 import Echart from '@/components/common/Echart';
 export default {
     name: 'dashboard',
@@ -119,9 +130,18 @@ export default {
                 chartMonth: {},
                 alarmingTrend: {}
             },
-            chartDayData: [],
-            chartWeekData: [],
-            chartMonthData: [],
+            chartDayData: {
+                data: [],
+                yTitle: []
+            },
+            chartWeekData: {
+                data: [],
+                yTitle: []
+            },
+            chartMonthData: {
+                data: [],
+                yTitle: []
+            },
             alarmingTrendData: {
                 x: [],
                 data: []
@@ -130,29 +150,128 @@ export default {
             chartWeek: null,
             chartMonth: null,
             alarmingTrend: null,
-            radio: 'today'
+            radio: '1',
+            warnDayNum: '', //日数据
+            warnDayPercentNum: '', //日同比百分比
+            warnWeekNum: '', //周数据
+            warnWeekPercentNum: '', //周同比百分比
+            warnMonthNum: '', //月数据
+            warnMonthPercentNum: '', //月同比百分比
+            topParams: {
+                top: 7,
+                days: 1
+            }, //TOP7报警量排行
+            topWarnDataList: [] //top排行数据集合
+            // arr: [
+            //     {
+            //         month: '1',
+            //         func: 'pr',
+            //         num: 1111
+            //     },
+            //     {
+            //         month: '2',
+            //         func: 'pr',
+            //         num: 1111
+            //     },
+            //     {
+            //         month: 'a',
+            //         func: 'zz',
+            //         num: 1111
+            //     },
+            //     {
+            //         month: 'b',
+            //         func: 'zz',
+            //         num: 1111
+            //     }
+            // ]
         };
+    },
+    created() {
+        // var result = this.arr.reduce((groups, item) => {
+        //   console.log(groups, item);
+        //     var groupFound = groups.find(arrItem => item.func == arrItem.func);
+        //     if (groupFound) {
+        //         groupFound.num.push(item.num);
+        //     } else {
+        //         var newGroup = {
+        //             func: item.func,
+        //             num: [item.num]
+        //         };
+        //         groups.push(newGroup);
+        //     }
+        //     return groups;
+        // }, []);
+        // console.log(result);
     },
     components: { Echart },
     mounted() {
-        //日 柱状图
-        this.chartDayData = [125, 100];
-        this.echartData.chartDay = this.drawDay(this.chartDayData);
-        //周 柱状图
-        this.chartWeekData = [880, 800];
-        this.echartData.chartWeek = this.drawDay(this.chartWeekData);
-        //月 柱状图
-        this.chartMonthData = [3100, 3200];
-        this.echartData.chartMonth = this.drawDay(this.chartMonthData);
-        //近7日报警趋势
-        this.alarmingTrendData.data = [100, 110, 130, 90, 80, 100, 125];
-        this.alarmingTrendData.x = ['8月13日', '8月14日', '8月15日', '8月16日', '8月17日', '8月18日', '8月19日'];
-        this.echartData.alarmingTrend = this.alarmingTrendBySevenDay(this.alarmingTrendData.data, this.alarmingTrendData.x);
+        //获取日数据
+        this.getAlertStatisticDaily();
+        //获取周数据
+        this.getAlertStatisticWeek();
+        //获取月数据
+        this.getAlertStatisticMonth();
+        //获取近7日报警趋势 数据
+        let obj = {
+          days : 7
+        }
+        this.getAlertTrendingBySeven(obj);
+        //获取top7报警
+        this.getAlertTrendingTop(this.topParams);
     },
     computed: {},
     methods: {
+        // 获取日数据
+        async getAlertStatisticDaily() {
+            let { data: res } = await getAlertStatisticDaily();
+            this.warnDayNum = res.count;
+            this.warnDayPercentNum = res.percent;
+            //日 柱状图
+            this.chartDayData.data.push(res.series[0].data[0], res.series[1].data[0]);
+            this.chartDayData.yTitle.push(res.series[0].name, res.series[1].name);
+            this.echartData.chartDay = this.drawDay(this.chartDayData.data, this.chartDayData.yTitle);
+        },
+        // 获取周数据
+        async getAlertStatisticWeek() {
+            let { data: res } = await getAlertStatisticWeek();
+            this.warnWeekNum = res.count;
+            this.warnWeekPercentNum = res.percent;
+            //周 柱状图
+            this.chartWeekData.data.push(res.series[0].data[0], res.series[1].data[0]);
+            this.chartWeekData.yTitle.push(res.series[0].name, res.series[1].name);
+            this.echartData.chartWeek = this.drawDay(this.chartWeekData.data, this.chartWeekData.yTitle);
+        },
+        // 获取月数据
+        async getAlertStatisticMonth() {
+            let { data: res } = await getAlertStatisticMonth();
+            this.warnMonthNum = res.count;
+            this.warnMonthPercentNum = res.percent;
+            //日 柱状图
+            this.chartMonthData.data.push(res.series[0].data[0], res.series[1].data[0]);
+            this.chartMonthData.yTitle.push(res.series[0].name, res.series[1].name);
+            this.echartData.chartMonth = this.drawDay(this.chartMonthData.data, this.chartMonthData.yTitle);
+        },
+        // 获取近7日数据
+        async getAlertTrendingBySeven(params) {
+            let { data: res } = await getAlertTrendingBySeven(params);
+            res[0].data.forEach(item => {
+                this.alarmingTrendData.data.push(item[1]);
+                this.alarmingTrendData.x.push(item[0]);
+            });
+            this.echartData.alarmingTrend = this.alarmingTrendBySevenDay(this.alarmingTrendData.data, this.alarmingTrendData.x);
+        },
+        // top 排行
+        async getAlertTrendingTop(params) {
+            let { data: res } = await getAlertTrendingTop(params);
+            this.topWarnDataList = res;
+        },
+        // 更改top日期
+        changeTopDate(val) {
+            this.topParams.days = val;
+            this.getAlertTrendingTop(this.topParams);
+        },
         // 日echart [125,100]
-        drawDay(data) {
+        drawDay(data, yTitle) {
             var option = {
                 tooltip: {
                     trigger: 'axis',
@@ -172,7 +291,8 @@ export default {
                     boundaryGap: [0, 0.01]
                 },
                 yAxis: {
-                    type: 'category'
+                    type: 'category',
+                    data: yTitle
                 },
                 series: [
                     {
@@ -357,7 +477,7 @@ export default {
     height: 80px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
     justify-content: space-between;
     padding-left: 50px;
     padding-right: 50px;
@@ -372,7 +492,8 @@ export default {
     height: 250px;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
+    border-top: 1px solid #999;
 }
 .alarmVolumeMesLeft {
     width: 40%;
@@ -398,7 +519,8 @@ export default {
     height: 100%;
 }
 .alarmingTrendBySevenDay {
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
+    border-top: 1px solid #999;
     height: 250px;
     padding-left: 20px;
     padding-right: 20px;
@@ -419,7 +541,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: #ccc;
-    color:#fff
+    color: #fff;
 }
 .redColor {
     background-color: rgb(238, 33, 12);
