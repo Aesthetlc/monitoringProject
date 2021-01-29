@@ -26,7 +26,7 @@
                     <!-- 报警量 Total -->
                     <div class="alarmVolumeMes">
                         <div class="alarmVolumeMesLeftNumTotal">Total</div>
-                        <div class="alarmVolumeMesLeftNumRight">34231</div>
+                        <div class="alarmVolumeMesLeftNumRight">{{ alertsTotalNum }}</div>
                     </div>
                 </el-card>
             </el-col>
@@ -50,17 +50,17 @@
                     </div>
                     <!-- 指示灯报警量排⾏行行 -->
                     <div class="indicatorRank">
-                        <div v-for="item in 7" class="alarmingTrendBySevenDayMes">
+                        <div v-for="(item, index) in indicatorLightDataList" class="alarmingTrendBySevenDayMes">
                             <div style="display:flex">
                                 <div
                                     class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: item == 1, pinkColor: item == 2, yellowColor: item == 3 }"
+                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
                                 >
-                                    {{ item }}
+                                    {{ index + 1 }}
                                 </div>
-                                <div>东配楼1F1A3</div>
+                                <div>{{ item.name }}</div>
                             </div>
-                            <div style="margin-right:10px">20</div>
+                            <div style="margin-right:10px">{{ item.count }}</div>
                         </div>
                     </div>
                 </el-card>
@@ -85,17 +85,17 @@
                     </div>
                     <!-- 安全帽报警量排⾏ -->
                     <div class="indicatorRank">
-                        <div v-for="item in 7" class="alarmingTrendBySevenDayMes">
+                        <div v-for="(item, index) in helmetDataList" class="alarmingTrendBySevenDayMes">
                             <div style="display:flex">
                                 <div
                                     class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: item == 1, pinkColor: item == 2, yellowColor: item == 3 }"
+                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
                                 >
-                                    {{ item }}
+                                    {{ index + 1 }}
                                 </div>
-                                <div>东配楼1F1A3</div>
+                                <div>{{ item.name }}</div>
                             </div>
-                            <div style="margin-right:10px">20</div>
+                            <div style="margin-right:10px">{{ item.count }}</div>
                         </div>
                     </div>
                 </el-card>
@@ -120,17 +120,17 @@
                     </div>
                     <!-- 静电服报警量排⾏ -->
                     <div class="indicatorRank">
-                        <div v-for="item in 7" class="alarmingTrendBySevenDayMes">
+                        <div v-for="(item, index) in antiStaticDataList" class="alarmingTrendBySevenDayMes">
                             <div style="display:flex">
                                 <div
                                     class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: item == 1, pinkColor: item == 2, yellowColor: item == 3 }"
+                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
                                 >
-                                    {{ item }}
+                                    {{ index + 1 }}
                                 </div>
-                                <div>东配楼1F1A3</div>
+                                <div>{{ item.name }}</div>
                             </div>
-                            <div style="margin-right:10px">20</div>
+                            <div style="margin-right:10px">{{ item.count }}</div>
                         </div>
                     </div>
                 </el-card>
@@ -142,6 +142,15 @@
 <script>
 import bus from '../common/bus';
 import Echart from '@/components/common/Echart';
+import {
+    getAlertsTotal,
+    getAlertsDistribution,
+    getTopRankingLight,
+    getTopRankingHelmet,
+    getTopRankingAntiStatic,
+    getTrendingTendency,
+    getAlertsTypeStatistics
+} from '@/api/policeStatistics.js';
 export default {
     name: 'policeStatistics',
     data() {
@@ -164,55 +173,121 @@ export default {
             alarmClassificationData: {
                 data: [],
                 dataTitle: []
-            } //报警量分类统计
+            }, //报警量分类统计
+            alertsTotalNum: '', //报警统计total
+            alertsTotalObj: {
+                createTime: {
+                    startTime: '2020/09/11 21:30:00',
+                    endTime: '2020/09/11 22:30:00'
+                },
+                cameras: [1, 2, 3]
+            }, // 获取报警统计参数
+            alertsTotalObjByTop: {
+                top: 7,
+                createTime: {
+                    startTime: '2020/09/11 21:30:00',
+                    endTime: '2020/09/11 22:30:00'
+                },
+                cameras: [1, 2, 3], //摄像头id数组
+                type: '' //摄像头检测模型
+            }, // 获取报警统计参数(带top)
+            helmetDataList: [], //安全帽数据
+            antiStaticDataList: [], //静电服数据
+            indicatorLightDataList: [] //指示灯数据
         };
     },
     components: { Echart },
-    mounted() {
-        //月 柱状图
-        (this.distributionData.dataTitle = ['指示灯', '安全帽', '静电服']),
-            (this.distributionData.data = [
-                { value: 335, name: '指示灯' },
-                { value: 310, name: '安全帽' },
-                { value: 234, name: '静电服' }
-            ]);
-        this.echartData.distribution = this.drawDistribution(this.distributionData.dataTitle, this.distributionData.data);
-        //近7日报警趋势
-        this.indicatorVariationData.dataTitle = ['指示灯', '安全帽', '静电服'];
-        this.indicatorVariationData.x = ['8月13日', '8月14日', '8月15日', '8月16日', '8月17日', '8月18日', '8月19日'];
-        this.indicatorVariationData.data = [
-            {
-                name: '指示灯',
-                type: 'line',
-                stack: '总量',
-                smooth: true,
-                data: [120, 132, 101, 134, 90, 230, 210]
-            },
-            {
-                name: '安全帽',
-                type: 'line',
-                stack: '总量',
-                smooth: true,
-                data: [220, 182, 191, 234, 290, 330, 310]
-            },
-            {
-                name: '静电服',
-                type: 'line',
-                stack: '总量',
-                smooth: true,
-                data: [150, 232, 201, 154, 190, 330, 410]
-            }
-        ];
-        this.echartData.indicatorVariation = this.drawIndicatorVariation(
-            this.indicatorVariationData.x,
-            this.indicatorVariationData.data,
-            this.indicatorVariationData.dataTitle
-        );
-        this.echartData.alarmClassification = this.drawAlarmClassification();
-    },
+    mounted() {},
     computed: {},
-    methods: {
+    created() {
+        //报警总计
+        this.getAlertsTotal(this.alertsTotalObj);
         //报警分布
+        this.getAlertsDistribution(this.alertsTotalObj);
+        //报警量变化趋势（带top 指示灯）
+        this.alertsTotalObjByTop.type = '2';
+        this.getTopRankingLight(this.alertsTotalObjByTop);
+        //报警量变化趋势（带top 安全帽）
+        this.alertsTotalObjByTop.type = '0';
+        this.getTopRankingHelmet(this.alertsTotalObjByTop);
+        //报警量变化趋势（带top 静电服）
+        this.alertsTotalObjByTop.type = '1';
+        this.getTopRankingAntiStatic(this.alertsTotalObjByTop);
+        //报警量变化趋势
+        this.getTrendingTendency(this.alertsTotalObj);
+        //报警量变化趋势
+        this.getAlertsTypeStatistics(this.alertsTotalObj);
+    },
+    methods: {
+        //报警总计
+        async getAlertsTotal(obj) {
+            let { data: res } = await getAlertsTotal(obj);
+            this.alertsTotalNum = res.count;
+        },
+        //报警分布
+        async getAlertsDistribution(obj) {
+            let { data: res } = await getAlertsDistribution(obj);
+            this.distributionData.dataTitle = res.names;
+            this.distributionData.data = res.series;
+            this.echartData.distribution = this.drawDistribution(this.distributionData.dataTitle, this.distributionData.data);
+        },
+        // 指示灯报警量top
+        async getTopRankingLight(obj) {
+            let { data: res } = await getTopRankingLight(obj);
+            this.indicatorLightDataList = res;
+        },
+        //安全帽报警量top
+        async getTopRankingHelmet(obj) {
+            let { data: res } = await getTopRankingHelmet(obj);
+            this.helmetDataList = res;
+        },
+        //静电服报警量top
+        async getTopRankingAntiStatic(obj) {
+            let { data: res } = await getTopRankingAntiStatic(obj);
+            this.antiStaticDataList = res;
+        },
+        // 报警量变化趋势 折线图
+        async getTrendingTendency(obj) {
+            let { data: res } = await getTrendingTendency(obj);
+            let arr = [];
+            let object = {};
+            res.forEach(item => {
+                this.indicatorVariationData.dataTitle.push(item.name);
+                if (item.data) {
+                    let result = item.data.map(ite => {
+                        return ite[1];
+                    });
+                    object.name = item.name;
+                    object.type = item.type;
+                    object.smooth = true;
+                    object.data = result;
+                    arr.push(JSON.parse(JSON.stringify(object)));
+                }
+            });
+            res[0].data.forEach(item => {
+                this.indicatorVariationData.x.push(item[0]);
+            });
+            this.indicatorVariationData.data = arr;
+            this.echartData.indicatorVariation = this.drawIndicatorVariation(
+                this.indicatorVariationData.x,
+                this.indicatorVariationData.data,
+                this.indicatorVariationData.dataTitle
+            );
+        },
+        // 报警量变化趋势 折线图
+        async getAlertsTypeStatistics(obj) {
+            let { data: res } = await getAlertsTypeStatistics(obj);
+            console.log(res);
+            res.forEach(item => {
+                this.alarmClassificationData.dataTitle.push(item.name);
+                this.alarmClassificationData.data.push(item.data[0]);
+            });
+            this.echartData.alarmClassification = this.drawAlarmClassification(
+                this.alarmClassificationData.dataTitle,
+                this.alarmClassificationData.data
+            );
+        },
+        //报警分布echarts
         drawDistribution(dataTitle, data) {
             var option = {
                 tooltip: {
@@ -283,7 +358,7 @@ export default {
             return option;
         },
         //报警量分类统计
-        drawAlarmClassification() {
+        drawAlarmClassification(dataTitle, data) {
             var option = {
                 color: ['#3398DB'],
                 tooltip: {
@@ -296,7 +371,7 @@ export default {
                     left: '3%',
                     right: '4%',
                     bottom: '3%',
-                    top:'7%',
+                    top: '7%',
                     containLabel: true
                 },
                 xAxis: {
@@ -305,13 +380,13 @@ export default {
                 },
                 yAxis: {
                     type: 'category',
-                    data: ['静电服', '安全帽', '指示灯']
+                    data: dataTitle
                 },
                 series: [
                     {
                         type: 'bar',
                         barWidth: 30,
-                        data: [160, 320, 240]
+                        data: data
                     }
                 ]
             };
@@ -327,7 +402,7 @@ export default {
     height: 80px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
     justify-content: space-between;
     padding-left: 50px;
     padding-right: 50px;
@@ -340,7 +415,8 @@ export default {
     height: 250px;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
+    border-top: 1px solid #999;
 }
 .alarmVolumeMesLeft {
     display: flex;
@@ -377,7 +453,8 @@ export default {
     height: 100%;
 }
 .indicatorRank {
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
+    border-top: 1px solid #999;
     height: 250px;
     padding-left: 20px;
     padding-right: 20px;

@@ -161,34 +161,33 @@ export default {
                 top: 7,
                 days: 1
             }, //TOP7报警量排行
-            topWarnDataList: [] //top排行数据集合
+            topWarnDataList: [], //top排行数据集合
             // arr: [
             //     {
             //         month: '1',
             //         func: 'pr',
-            //         num: 1111
+            //         num: 111
             //     },
             //     {
             //         month: '2',
             //         func: 'pr',
-            //         num: 1111
+            //         num: 222
             //     },
             //     {
             //         month: 'a',
             //         func: 'zz',
-            //         num: 1111
+            //         num: 333
             //     },
             //     {
             //         month: 'b',
             //         func: 'zz',
-            //         num: 1111
+            //         num: 333
             //     }
             // ]
         };
     },
     created() {
         // var result = this.arr.reduce((groups, item) => {
-        //   console.log(groups, item);
         //     var groupFound = groups.find(arrItem => item.func == arrItem.func);
         //     if (groupFound) {
         //         groupFound.num.push(item.num);
@@ -213,8 +212,8 @@ export default {
         this.getAlertStatisticMonth();
         //获取近7日报警趋势 数据
         let obj = {
-          days : 7
-        }
+            days: 7
+        };
         this.getAlertTrendingBySeven(obj);
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
