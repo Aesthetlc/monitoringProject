@@ -2,24 +2,29 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" inline :model="form" label-width="100px">
+                <el-form ref="form" inline :model="form" label-width="120px">
                     <el-form-item label="摄像机ip">
                         <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像机位置">
-                        <el-input v-model="form.address" placeholder="请输入摄像机位置"></el-input>
+                        <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item label="报警筛选">
-                        <el-select v-model="form.warn" placeholder="筛选条件">
-                            <el-option label="警告1" value="jinggao1"></el-option>
-                            <el-option label="警告2" value="jinggao2"></el-option>
+                    <el-form-item label="开启状态">
+                        <el-select v-model="form.stateArray" multiple placeholder="筛选状态">
+                            <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="摄像头检测模型">
+                        <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选模型">
+                            <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="报警时间">
                         <div class="block">
                             <el-date-picker
-                                v-model="form.time"
-                                type="daterange"
+                                v-model="form.createTime"
+                                type="datetimerange"
                                 range-separator="至"
                                 start-placeholder="开始日期"
                                 end-placeholder="结束日期"
@@ -45,9 +50,9 @@
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
-                <el-table-column prop="type" label="类型" align="center"></el-table-column>
-                <el-table-column prop="warnTime" label="报警时间" align="center"></el-table-column>
+                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="detectModelType" label="类型" align="center"></el-table-column>
+                <el-table-column prop="createTime" label="报警时间" align="center"></el-table-column>
 
                 <el-table-column label="缩略图" align="center">
                     <template slot-scope="scope">
@@ -67,23 +72,23 @@
                     background
                     :page-sizes="[5, 10, 15, 20]"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :current-page="pages.limit"
-                    :page-size="pages.size"
-                    :total="pages.total"
+                    :current-page="form.pageNum"
+                    :page-pageSize="form.pageSize"
+                    :total="total"
                     @current-change="handlePageChange"
-                    @size-change="handleSizeChange"
+                    @pageSize-change="handleSizeChange"
                 ></el-pagination>
             </div>
         </div>
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
+            <el-form ref="form" :model="form1" label-width="70px">
+                <el-form-item label="ip">
+                    <el-input v-model="form1.ip"></el-input>
                 </el-form-item>
                 <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
+                    <el-input v-model="form1.position"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -95,42 +100,89 @@
 </template>
 
 <script>
-import { fetchData } from '../../api/index';
+import { getAlertEventsState, getAlertEventsQuery } from '@/api/alertEvents.js';
 import { timeFormat } from '@/utils/tool.js';
 export default {
     name: 'alarmManagement',
     data() {
         return {
             form: {
-                ip: '',
-                address: '',
-                warn: 1,
-                time: []
+                ip: '', //摄像头ip地址
+                position: '', //摄像头位置
+                stateArray: [], //报警事件开启状态
+                detectModelTypeArray: [], //摄像头检测模型
+                createTime: [], //报警事件创建时间
+                sort: {}, //排序
+                pagenation: {
+                    pageNum: 1,
+                    pageSize: 5
+                }
             },
-            pages: {
-                total: 5,
-                limit: 1,
-                size: 5
-            },
+            total: 5,
+            stateArray: [], //状态  启动/关闭
+            detectModelTypeArray: [], //摄像头检测模型
+            form1:{},//弹窗对象form
             tableData: [],
             multipleSelection: [],
             delList: [],
             editVisible: false,
             pageTotal: 0,
-            form: {},
             idx: -1,
             id: -1
         };
     },
     created() {
-        this.getData();
+        //获取所有状态信息，用于分类筛选
+        this.getAlertEventsState();
+        //摄像头检测模型
+        this.getDetectModelTypeArray();
+        //根据条件分页展示报警事件信息
+        console.log(this.form);
+        this.getAlertEventsQuery(this.form);
+    },
+    watch: {
+        'form.createTime': {
+            handler(newVal, oldVal) {
+                let obj = {};
+                obj.startTime = timeFormat(newVal[0]);
+                obj.endTime = timeFormat(newVal[1]);
+                console.log(obj);
+            }
+        }
     },
     methods: {
-        // 获取 easy-mock 的模拟数据
-        async getData() {
-            let res = await fetchData(this.form);
-            this.tableData = res.list;
-            this.pages.total = res.pageTotal || 5;
+        //获取所有状态信息，用于分类筛选
+        async getAlertEventsState() {
+            let { data: res } = await getAlertEventsState();
+            res.forEach(item => {
+                this.stateArray.push({
+                    value: item.code,
+                    label: item.name
+                });
+            });
+        },
+        //摄像头检测模型
+        getDetectModelTypeArray() {
+            this.detectModelTypeArray = [
+                {
+                    value: '0',
+                    label: '类型1'
+                },
+                {
+                    value: '1',
+                    label: '类型2'
+                },
+                {
+                    value: '2',
+                    label: '类型3'
+                }
+            ];
+        },
+        // 根据条件分页展示报警事件信息
+        async getAlertEventsQuery(obj) {
+            let { data: res } = await getAlertEventsQuery(obj);
+            this.tableData = res;
+            this.total = res.pageTotal || 5;
         },
         //重置表单
         resetForm() {
@@ -138,8 +190,8 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
-            this.$set(this.pages, 'limit', 1);
-            this.getData();
+            this.$set(this.form, 'pageNum', 1);
+            this.getAlertEventsQuery();
         },
         // 删除操作
         handleDelete(index, row) {
@@ -170,7 +222,7 @@ export default {
         // 编辑操作
         handleEdit(index, row) {
             this.idx = index;
-            this.form = row;
+            this.form1 = row;
             this.editVisible = true;
         },
         // 保存编辑
@@ -181,12 +233,12 @@ export default {
         },
         // 分页导航
         handlePageChange(val) {
-            this.$set(this.pages, 'limit', val);
-            this.getData();
+            this.$set(this.form, 'pageNum', val);
+            this.getAlertEventsQuery();
         },
         handleSizeChange(val) {
-            this.$set(this.pages, 'size', val);
-            this.getData();
+            this.$set(this.form, 'pageSize', val);
+            this.getAlertEventsQuery();
         }
     }
 };
@@ -207,7 +259,7 @@ export default {
 }
 .table {
     width: 100%;
-    font-size: 14px;
+    font-pagesize: 14px;
 }
 .red {
     color: #ff0000;

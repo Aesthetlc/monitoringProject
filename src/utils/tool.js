@@ -10,6 +10,6 @@ export function timeFormat(Time) {
     function add0(m) {
         return m < 10 ? '0' + m : m;
     }
-    var startTime = add0(year) + '-' + add0(month) + '-' + add0(date) + ' ' + add0(hours) + '-' + add0(minutes) + '-' + add0(seconds);
+    var startTime = add0(year) + '/' + add0(month) + '/' + add0(date) + ' ' + add0(hours) + ':' + add0(minutes) + ':' + add0(seconds);
     return startTime;
 }
