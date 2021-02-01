@@ -46,13 +46,15 @@
                 ref="multipleTable"
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
+                @sort-change="sortChange"
+                :default-sort="{ prop: 'id', order: 'ascending' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
-                <el-table-column prop="detectModelType" label="类型" align="center"></el-table-column>
-                <el-table-column prop="createTime" label="报警时间" align="center"></el-table-column>
+                <el-table-column sortable="custom" prop="id" label="ID" width="60" align="center"></el-table-column>
+                <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
+                <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column sortable="custom" prop="detectModelType" label="类型" align="center"></el-table-column>
+                <el-table-column sortable="custom" prop="createTime" label="报警时间" align="center"></el-table-column>
 
                 <el-table-column label="缩略图" align="center">
                     <template slot-scope="scope">
@@ -63,7 +65,8 @@
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
-                        <el-button type="text" @click="handleDelete(scope.$index, scope.row)">关闭</el-button>
+                        <el-button type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">关闭</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -100,7 +103,13 @@
 </template>
 
 <script>
-import { getAlertEventsState, getAlertEventsQuery } from '@/api/alertEvents.js';
+import {
+    getAlertEventsState,
+    getAlertEventsQuery,
+    getAlertEventsCount,
+    deleteAlertEventsById,
+    closeAlertEventsById
+} from '@/api/alertEvents.js';
 import { timeFormat } from '@/utils/tool.js';
 export default {
     name: 'alarmManagement',
@@ -112,7 +121,7 @@ export default {
                 stateArray: [], //报警事件开启状态
                 detectModelTypeArray: [], //摄像头检测模型
                 createTime: [], //报警事件创建时间
-                sort: {}, //排序
+                sort: { field: 'id', type: 'ascending' }, //排序
                 pagenation: {
                     pageNum: 1,
                     pageSize: 5
@@ -121,12 +130,11 @@ export default {
             total: 5,
             stateArray: [], //状态  启动/关闭
             detectModelTypeArray: [], //摄像头检测模型
-            form1:{},//弹窗对象form
+            form1: {}, //弹窗对象form
             tableData: [],
             multipleSelection: [],
             delList: [],
             editVisible: false,
-            pageTotal: 0,
             idx: -1,
             id: -1
         };
@@ -137,8 +145,12 @@ export default {
         //摄像头检测模型
         this.getDetectModelTypeArray();
         //根据条件分页展示报警事件信息
-        console.log(this.form);
         this.getAlertEventsQuery(this.form);
+        //报警事件总量查询
+        let obj = JSON.parse(JSON.stringify(this.form));
+        delete obj.sort;
+        delete obj.pagenation;
+        this.getAlertEventsCount(obj);
     },
     watch: {
         'form.createTime': {
@@ -151,6 +163,17 @@ export default {
         }
     },
     methods: {
+        //排序
+        sortChange(column) {
+            if (column.order !== null) {
+                this.form.sort.field = column.prop;
+                if (column.order === 'descending') {
+                    this.form.sort.type = 'desc';
+                } else if (column.order === 'ascending') {
+                    this.form.sort.type = 'asc';
+                }
+            }
+        },
         //获取所有状态信息，用于分类筛选
         async getAlertEventsState() {
             let { data: res } = await getAlertEventsState();
@@ -182,7 +205,11 @@ export default {
         async getAlertEventsQuery(obj) {
             let { data: res } = await getAlertEventsQuery(obj);
             this.tableData = res;
-            this.total = res.pageTotal || 5;
+        },
+        //报警事件总量查询
+        async getAlertEventsCount(obj) {
+            let { data: res } = await getAlertEventsCount(obj);
+            this.total = res.count || 5;
         },
         //重置表单
         resetForm() {
@@ -191,19 +218,66 @@ export default {
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.form, 'pageNum', 1);
-            this.getAlertEventsQuery();
+            this.getAlertEventsQuery(this.form);
+            let obj = JSON.parse(JSON.stringify(this.form));
+            delete obj.sort;
+            delete obj.pagenation;
+            this.getAlertEventsCount(obj);
         },
         // 删除操作
         handleDelete(index, row) {
-            // 二次确认删除
-            this.$confirm('确定要删除吗？', '提示', {
+            this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
                 type: 'warning'
             })
-                .then(() => {
-                    this.$message.success('删除成功');
-                    this.tableData.splice(index, 1);
+                .then(async () => {
+                    let { data: res } = await deleteAlertEventsById(row.id);
+                    if (res.result === 'success') {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.tableData.splice(index, 1);
+                    } else {
+                        this.$message.error('删除失败');
+                    }
                 })
-                .catch(() => {});
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+        },
+        // 删除操作
+        handleClose(index, row) {
+            this.$confirm('您是否要关闭该事件警告?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(async () => {
+                    let closeObj = {
+                        state: true,
+                        operator:'stop'
+                    };
+                    let { data: res } = await closeAlertEventsById(closeObj,row.id);
+                    if (res.result === 'success') {
+                        this.$message({
+                            type: 'success',
+                            message: '关闭成功!'
+                        });
+                    } else {
+                        this.$message.error('关闭失败');
+                    }
+                })
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消关闭'
+                    });
+                });
         },
         // 多选操作
         handleSelectionChange(val) {
@@ -234,11 +308,19 @@ export default {
         // 分页导航
         handlePageChange(val) {
             this.$set(this.form, 'pageNum', val);
-            this.getAlertEventsQuery();
+            this.getAlertEventsQuery(this.form);
+            let obj = JSON.parse(JSON.stringify(this.form));
+            delete obj.sort;
+            delete obj.pagenation;
+            this.getAlertEventsCount(obj);
         },
         handleSizeChange(val) {
             this.$set(this.form, 'pageSize', val);
-            this.getAlertEventsQuery();
+            this.getAlertEventsQuery(this.form);
+            let obj = JSON.parse(JSON.stringify(this.form));
+            delete obj.sort;
+            delete obj.pagenation;
+            this.getAlertEventsCount(obj);
         }
     }
 };
