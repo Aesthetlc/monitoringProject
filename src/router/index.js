@@ -16,42 +16,42 @@ export default new Router({
                 {
                     name: '首页',
                     path: '',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/dashboard.vue'),
+                    component: () => import(/* webpackChunkName: "dashboard" */ '../views/page/dashboard.vue'),
                     meta: { title: '首页' }
                 },
                 {
                     name: '实时监控',
                     path: 'realTimeMonitoring',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/realTimeMonitoring.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/realTimeMonitoring.vue'),
                     meta: { title: '实时监控' }
                 },
                 {
                     name: '报警管理',
                     path: 'alarmManagement',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/alarmManagement.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/alarmManagement.vue'),
                     meta: { title: '报警管理' }
                 },
                 {
                     name: '报警统计',
                     path: 'policeStatistics',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/policeStatistics.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/policeStatistics.vue'),
                     meta: { title: '报警统计' }
                 },
                 {
                     path: '404',
-                    component: () => import(/* webpackChunkName: "404" */ '../components/page/404.vue'),
+                    component: () => import(/* webpackChunkName: "404" */ '../views/page/404.vue'),
                     meta: { title: '404' }
                 },
                 {
                     path: '403',
-                    component: () => import(/* webpackChunkName: "403" */ '../components/page/403.vue'),
+                    component: () => import(/* webpackChunkName: "403" */ '../views/page/403.vue'),
                     meta: { title: '403' }
                 }
             ]
         },
         {
             path: '/login',
-            component: () => import(/* webpackChunkName: "login" */ '../components/page/Login.vue'),
+            component: () => import(/* webpackChunkName: "login" */ '../views/page/Login.vue'),
             meta: { title: '登录' }
         },
         {

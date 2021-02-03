@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import bus from '../common/bus';
+import bus from '@/components/common/bus';
 import {
     getAlertTrendingBySeven,
     getAlertStatisticDaily,

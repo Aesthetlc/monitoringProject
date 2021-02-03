@@ -140,7 +140,7 @@
 </template>
 
 <script>
-import bus from '../common/bus';
+import bus from '@/components/common/bus';
 import Echart from '@/components/common/Echart';
 import {
     getAlertsTotal,
