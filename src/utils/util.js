@@ -19,8 +19,8 @@ util.timestampToDateTime = function(value) {
         return ''
     } else {
         var date = new Date(value)
-        var YY = date.getFullYear() + '-'
-        var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        var YY = date.getFullYear() + '/'
+        var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '/'
         var DD = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
         var hh = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
         var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'

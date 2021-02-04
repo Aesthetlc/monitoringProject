@@ -157,8 +157,11 @@ export default {
         'form.createTime': {
             handler(newVal, oldVal) {
                 let obj = {};
-                obj.startTime = timeFormat(newVal[0]);
-                obj.endTime = timeFormat(newVal[1]);
+                // obj.startTime = timeFormat(newVal[0]);
+                // obj.endTime = timeFormat(newVal[1]);
+                // console.log(obj);
+                obj.startTime = this.$util.timestampToDateTime(newVal[0]);
+                obj.endTime = this.$util.timestampToDateTime(newVal[1]);
                 console.log(obj);
             }
         },
