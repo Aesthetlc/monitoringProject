@@ -2,20 +2,20 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" inline :model="form" label-width="120px">
-                    <el-form-item label="摄像机ip">
+                <el-form ref="form" style="width:100%" inline :model="form" label-width="120px">
+                    <el-form-item style="width:24%" label="摄像机ip">
                         <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item label="摄像机位置">
+                    <el-form-item style="width:24%" label="摄像机位置">
                         <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item label="开启状态">
+                    <el-form-item style="width:24%" label="开启状态">
                         <el-select v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="摄像头检测模型">
-                        <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选模型">
+                    <el-form-item style="width:24%" label="摄像头检测模型">
+                        <el-select  v-model="form.detectModelTypeArray" multiple placeholder="筛选模型">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
@@ -110,6 +110,7 @@ import {
     deleteAlertEventsById,
     closeAlertEventsById
 } from '@/api/alertEvents.js';
+import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
 import { timeFormat } from '@/utils/tool.js';
 export default {
     name: 'alarmManagement',
@@ -142,8 +143,6 @@ export default {
     created() {
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
-        //摄像头检测模型
-        this.getDetectModelTypeArray();
         //根据条件分页展示报警事件信息
         this.getAlertEventsQuery(this.form);
         //报警事件总量查询
@@ -151,6 +150,8 @@ export default {
         delete obj.sort;
         delete obj.pagenation;
         this.getAlertEventsCount(obj);
+        //检测模型类别查询接口
+        this.getDetectModelsTypes();
     },
     watch: {
         'form.createTime': {
@@ -159,6 +160,16 @@ export default {
                 obj.startTime = timeFormat(newVal[0]);
                 obj.endTime = timeFormat(newVal[1]);
                 console.log(obj);
+            }
+        },
+        'form.detectModelTypeArray': {
+            handler(newVal, oldVal) {
+                console.log(newVal);
+            }
+        },
+        'form.stateArray': {
+            handler(newVal, oldVal) {
+                console.log(newVal);
             }
         }
     },
@@ -185,21 +196,14 @@ export default {
             });
         },
         //摄像头检测模型
-        getDetectModelTypeArray() {
-            this.detectModelTypeArray = [
-                {
-                    value: '0',
-                    label: '安全帽'
-                },
-                {
-                    value: '1',
-                    label: '指示灯'
-                },
-                {
-                    value: '2',
-                    label: '静电服'
-                }
-            ];
+        async getDetectModelsTypes() {
+            let { data: res } = await getDetectModelsTypes();
+            res.forEach(item => {
+                this.detectModelTypeArray.push({
+                    value: item.code,
+                    label: item.name
+                });
+            });
         },
         // 根据条件分页展示报警事件信息
         async getAlertEventsQuery(obj) {
@@ -260,9 +264,9 @@ export default {
                 .then(async () => {
                     let closeObj = {
                         state: true,
-                        operator:'stop'
+                        operator: 'stop'
                     };
-                    let { data: res } = await closeAlertEventsById(closeObj,row.id);
+                    let { data: res } = await closeAlertEventsById(closeObj, row.id);
                     if (res.result === 'success') {
                         this.$message({
                             type: 'success',
