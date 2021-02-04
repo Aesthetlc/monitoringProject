@@ -38,7 +38,7 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <el-button type="primary" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量关闭</el-button>
+            <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量删除</el-button>
             <el-table
                 :data="tableData"
                 border
@@ -64,8 +64,8 @@
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
-                        <el-button type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <!-- <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button> -->
+                        <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">关闭</el-button>
                     </template>
                 </el-table-column>
@@ -189,15 +189,15 @@ export default {
             this.detectModelTypeArray = [
                 {
                     value: '0',
-                    label: '类型1'
+                    label: '安全帽'
                 },
                 {
                     value: '1',
-                    label: '类型2'
+                    label: '指示灯'
                 },
                 {
                     value: '2',
-                    label: '类型3'
+                    label: '静电服'
                 }
             ];
         },
