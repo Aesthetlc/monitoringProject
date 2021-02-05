@@ -4,8 +4,8 @@
             <el-form-item label="摄像头ip" prop="ip">
                 <el-input v-model="ruleForm.ip"></el-input>
             </el-form-item>
-            <el-form-item label="模板类型">
-                <el-input v-model="ruleForm.modelType"></el-input>
+            <el-form-item label="模板类型" prop="modelType">
+                <el-input disabled v-model="ruleForm.modelType"></el-input>
             </el-form-item>
             <el-form-item label="摄像头位置" prop="position">
                 <el-input v-model="ruleForm.position"></el-input>
@@ -19,23 +19,27 @@
 </template>
 
 <script>
-import { addCameras } from '@/api/cameraManagement.js'; //摄像头类型
+import { addCameras, detectModelsCameraByIp } from '@/api/cameraManagement.js'; //摄像头类型
 export default {
     data() {
         var checkIp = (rule, value, callback) => {
             const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
             if (!value) {
-                return callback(new Error('摄像头IP不能为空'));
+                return callback(new Error('摄像头IP不res能为空'));
             } else if (!reg.test(value) && value != '') {
                 callback(new Error('请输入正确的IP地址'));
             } else if (value) {
                 setTimeout(() => {
-                    if (value == '1.2.3.4') {
-                        callback(new Error('ip已存在'));
-                    } else {
-                        callback();
-                    }
-                }, 1000);
+                    detectModelsCameraByIp(value).then(res => {
+                        this.detectModelId = res.data.detectModelId;
+                        this.ruleForm.modelType = res.data.detectModelType;
+                        if (res.content != '请求成功') {
+                            callback(new Error(res.content));
+                        } else {
+                            callback();
+                        }
+                    });
+                }, 500);
             }
         };
         return {
@@ -44,6 +48,7 @@ export default {
                 modelType: '',
                 position: ''
             },
+            detectModelId: '', //模型Id
             rules: {
                 ip: [
                     { required: true, message: '请输入摄像头ip', trigger: 'blur' },
@@ -53,13 +58,19 @@ export default {
             }
         };
     },
-    mounted() {},
+    mounted() {
+        console.log(this.ruleForm);
+    },
     methods: {
         submitForm(formName) {
+            console.log('第一遍');
             this.$refs[formName].validate(async valid => {
                 if (valid) {
-                    console.log(this.ruleForm);
-                    let { data: res } = await addCameras(this.ruleForm);
+                    let obj = JSON.parse(JSON.stringify(this.ruleForm));
+                    delete obj.modelType;
+                    obj.detectModelId = this.detectModelId;
+                    console.log(obj);
+                    let { data: res } = await addCameras(obj);
                     if (res.result === 'success') {
                         this.$message({
                             type: 'success',

@@ -1,0 +1,13 @@
+{
+  "code": "00000",
+  "msg": "请求成功",
+  "content": "请求成功",
+  "data": {
+    "detectModelId": 0,
+    "detectModelPath": "/opt/app/models/10.221.170.167",
+    "detectModelFile": "0.pt",
+    "detectModelName": "10.221.170.167检测模型",
+    "detectModelType": "安全帽",
+    "createTime": "2020/09/11 21:30:00"
+  }
+}
