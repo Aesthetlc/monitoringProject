@@ -65,6 +65,11 @@ export default {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/policeStatistics',
                     title: '报警统计'
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
+                    index: '/home/cameraManagement',
+                    title: '摄像头管理'
                 }
             ]
         };

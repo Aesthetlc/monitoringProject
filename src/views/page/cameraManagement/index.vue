@@ -10,7 +10,7 @@
                         <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
                     <el-form-item style="width:24%" label="摄像头筛选">
-                        <el-select  v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                        <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
@@ -32,13 +32,15 @@
                             </el-date-picker>
                         </div>
                     </el-form-item>
+
                     <el-form-item>
                         <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
                         <el-button @click="resetForm('ruleForm')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
-            <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量删除</el-button>
+            <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addCamera">添加</el-button>
+            <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="batchAddCamera">批量添加</el-button>
             <el-table
                 :data="tableData"
                 border
@@ -54,19 +56,19 @@
                 <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="detectModelType" label="类别" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="createTime" label="报警时间" align="center"></el-table-column>
-
-                <el-table-column label="缩略图" align="center">
+                <el-table-column sortable="custom" prop="state" label="状态" align="center">
                     <template slot-scope="scope">
-                        <el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
+                        <span v-if="scope.row.state">启动</span>
+                        <span v-else>停止</span>
                     </template>
                 </el-table-column>
+                <el-table-column sortable="custom" prop="createTime" label="创建时间" align="center"></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <!-- <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button> -->
                         <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                        <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">关闭</el-button>
+                        <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">停止</el-button>
+                        <el-button v-if="!scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">启动</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -84,74 +86,57 @@
             </div>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form1" label-width="70px">
-                <el-form-item label="ip">
-                    <el-input v-model="form1.ip"></el-input>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form1.position"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
+        <!-- 添加弹出框 -->
+        <el-dialog title="添加摄像头" :visible.sync="addCameraFlag" width="40%" :before-close="handleCloseDialog">
+            <add-camera @closeAddCameraDialog="closeAddCameraDialog" ref="addCamera"></add-camera>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import {
-    getAlertEventsState,
-    getAlertEventsQuery,
-    getAlertEventsCount,
-    deleteAlertEventsById,
-    closeAlertEventsById
-} from '@/api/alertEvents.js';
-import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
-import { timeFormat } from '@/utils/tool.js';
+import { getAlertEventsState } from '@/api/alertEvents.js';
+import { getDetectModelsTypes, getCamerasQuery, getCamerasCount, deleteCamerasById, updateCamerasState } from '@/api/cameraManagement.js'; //摄像头类型
+import addCamera from '@/views/page/cameraManagement/addCamera.vue';
 export default {
-    name: 'alarmManagement',
+    name: 'cameraManagement',
     data() {
         return {
             form: {
                 ip: '', //摄像头ip地址
                 position: '', //摄像头位置
-                stateArray: [], //报警事件开启状态
-                detectModelTypeArray: [], //摄像头检测模型
                 createTime: [], //报警事件创建时间
-                sort: { field: 'id', type: 'ascending' }, //排序
+                detectModelTypeArray: [], //摄像头检测模型
+                stateArray: [], //报警事件开启状态
                 pagenation: {
                     pageNum: 1,
                     pageSize: 5
-                }
+                },
+                sort: { field: 'id', type: 'ascending' } //排序
             },
             total: 5,
             stateArray: [], //状态  启动/关闭
             detectModelTypeArray: [], //摄像头检测模型
-            form1: {}, //弹窗对象form
+            addCameraFlag: false,
             tableData: [],
             multipleSelection: [],
-            delList: [],
-            editVisible: false,
-            idx: -1,
-            id: -1
+            delList: []
         };
     },
+    components: {
+        addCamera
+    },
     created() {
+        //摄像头分页查询接口
+        this.getCamerasQuery(this.form);
+        //检测模型类别查询接口
+        this.getDetectModelsTypes();
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
-        //根据条件分页展示报警事件信息
-        this.getAlertEventsQuery(this.form);
         //报警事件总量查询
         let obj = JSON.parse(JSON.stringify(this.form));
         delete obj.sort;
         delete obj.pagenation;
-        this.getAlertEventsCount(obj);
-        //检测模型类别查询接口
-        this.getDetectModelsTypes();
+        this.getCamerasCount(obj);
     },
     watch: {
         'form.createTime': {
@@ -177,6 +162,23 @@ export default {
         }
     },
     methods: {
+        closeAddCameraDialog() {
+            this.addCameraFlag = false;
+        },
+        // 关闭添加的弹窗
+        handleCloseDialog() {
+            this.addCameraFlag = false;
+        },
+        //添加摄像头
+        addCamera() {
+            this.addCameraFlag = true;
+            if (this.$refs.addCamera) {
+                this.$refs.addCamera.$refs.ruleForm.clearValidate();
+                this.$refs.addCamera.$refs.ruleForm.resetFields();
+            }
+        },
+        //批量添加摄像头
+        batchAddCamera() {},
         //排序
         sortChange(column) {
             if (column.order !== null) {
@@ -209,13 +211,13 @@ export default {
             });
         },
         // 根据条件分页展示报警事件信息
-        async getAlertEventsQuery(obj) {
-            let { data: res } = await getAlertEventsQuery(obj);
+        async getCamerasQuery(obj) {
+            let { data: res } = await getCamerasQuery(obj);
             this.tableData = res;
         },
         //报警事件总量查询
-        async getAlertEventsCount(obj) {
-            let { data: res } = await getAlertEventsCount(obj);
+        async getCamerasCount(obj) {
+            let { data: res } = await getCamerasCount(obj);
             this.total = res.count || 5;
         },
         //重置表单
@@ -225,11 +227,11 @@ export default {
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.form, 'pageNum', 1);
-            this.getAlertEventsQuery(this.form);
+            this.getCamerasQuery(this.form);
             let obj = JSON.parse(JSON.stringify(this.form));
             delete obj.sort;
             delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            this.getCamerasCount(obj);
         },
         // 删除操作
         handleDelete(index, row) {
@@ -239,7 +241,7 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    let { data: res } = await deleteAlertEventsById(row.id);
+                    let { data: res } = await deleteCamerasById(row.id);
                     if (res.result === 'success') {
                         this.$message({
                             type: 'success',
@@ -257,9 +259,15 @@ export default {
                     });
                 });
         },
-        // 关闭操作
+        // (启动/关闭) 操作
         handleClose(index, row) {
-            this.$confirm('您是否要关闭该事件警告?', '提示', {
+            let mes = '';
+            if (row.state) {
+                mes = '停止';
+            } else if (!row.state) {
+                mes = '启动';
+            }
+            this.$confirm(`您是否要${mes}该条记录?`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
@@ -267,22 +275,22 @@ export default {
                 .then(async () => {
                     let closeObj = {
                         state: row.state,
-                        operator: 'stop'
+                        operator: mes === '停止' ? false : true
                     };
-                    let { data: res } = await closeAlertEventsById(closeObj, row.id);
+                    let { data: res } = await updateCamerasState(closeObj, row.id);
                     if (res.result === 'success') {
                         this.$message({
                             type: 'success',
-                            message: '关闭成功!'
+                            message: '更新成功!'
                         });
                     } else {
-                        this.$message.error('关闭失败');
+                        this.$message.error('更新失败');
                     }
                 })
                 .catch(() => {
                     this.$message({
                         type: 'info',
-                        message: '已取消关闭'
+                        message: '已取消操作'
                     });
                 });
         },
@@ -300,34 +308,22 @@ export default {
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
         },
-        // 编辑操作
-        handleEdit(index, row) {
-            this.idx = index;
-            this.form1 = row;
-            this.editVisible = true;
-        },
-        // 保存编辑
-        saveEdit() {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
-        },
         // 分页导航
         handlePageChange(val) {
             this.$set(this.form, 'pageNum', val);
-            this.getAlertEventsQuery(this.form);
+            this.getCamerasQuery(this.form);
             let obj = JSON.parse(JSON.stringify(this.form));
             delete obj.sort;
             delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            this.getCamerasCount(obj);
         },
         handleSizeChange(val) {
             this.$set(this.form, 'pageSize', val);
-            this.getAlertEventsQuery(this.form);
+            this.getCamerasQuery(this.form);
             let obj = JSON.parse(JSON.stringify(this.form));
             delete obj.sort;
             delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            this.getCamerasCount(obj);
         }
     }
 };

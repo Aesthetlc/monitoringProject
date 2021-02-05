@@ -1,0 +1,20 @@
+{
+  "code": "00000",
+  "msg": "请求成功",
+  "content": "请求成功",
+  "data": [{
+    "id": 1,
+    "ip": "10.221.170.167",
+    "position": "东配楼1F1A3",
+    "createTime": "2020/09/11 21:30:00",
+    "detectModelType": "安全帽",
+    "state": true
+  }, {
+    "id": 2,
+    "ip": "10.221.170.167",
+    "position": "东配楼1F1A3",
+    "createTime": "2020/09/11 21:30:00",
+    "detectModelType": "指示灯",
+    "state": false
+  }]
+}

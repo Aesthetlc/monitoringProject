@@ -38,6 +38,12 @@ export default new Router({
                     meta: { title: '报警统计' }
                 },
                 {
+                    name: '摄像头管理',
+                    path: 'cameraManagement',
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/cameraManagement'),
+                    meta: { title: '摄像头管理' }
+                },
+                {
                     path: '404',
                     component: () => import(/* webpackChunkName: "404" */ '../views/page/404.vue'),
                     meta: { title: '404' }
