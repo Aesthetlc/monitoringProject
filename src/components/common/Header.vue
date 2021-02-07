@@ -36,6 +36,7 @@
     </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import bus from '@/components/common/bus';
 export default {
     data() {
@@ -48,7 +49,8 @@ export default {
     },
     computed: {
         username() {
-            let username = sessionStorage.getItem('ms_username');
+            // let username = sessionStorage.getItem('ms_username');
+            let username = Cookies.get('token');
             return username ? username : this.name;
         }
     },
@@ -56,7 +58,8 @@ export default {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
-                sessionStorage.removeItem('ms_username');
+                // sessionStorage.removeItem('token');
+                Cookies.remove('token');
                 this.$router.push('/login');
             }
         },

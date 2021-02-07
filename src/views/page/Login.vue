@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { mapMutations } from 'vuex';
 export default {
     data: function() {
@@ -43,7 +44,7 @@ export default {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     this.$message.success('登录成功');
-                    sessionStorage.setItem('ms_username', this.param.username);
+                    Cookies.set('token', this.param.username);
                     let obj = { a: 1, b: 2 }
                     this.addMonitoringArr(obj);
                     this.$router.push('/home');

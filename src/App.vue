@@ -6,6 +6,7 @@
 <script>
 import { mapMutations } from 'vuex';
 import { mapState } from 'vuex';
+import Cookies from 'js-cookie'
 export default {
     computed: {
         ...mapState(['monitoringArr'])
@@ -15,15 +16,16 @@ export default {
     },
     created() {
         //在页面加载时读取sessionStorage里的状态信息
-        if (window.sessionStorage.getItem('monitoringArr')) {
-            console.log(1, JSON.parse(window.sessionStorage.getItem('monitoringArr')));
-            this.updateMonitoringArr(JSON.parse(window.sessionStorage.getItem('monitoringArr')));
+        // if (window.sessionStorage.getItem('monitoringArr')) {
+        if (Cookies.get('monitoringArr')) {
+            // this.updateMonitoringArr(JSON.parse(window.sessionStorage.getItem('monitoringArr')));
+            this.updateMonitoringArr(JSON.parse(Cookies.get('monitoringArr')));
         }
 
         //在页面刷新时将vuex里的信息保存到sessionStorage里
         window.addEventListener('beforeunload', () => {
-            console.log(2,JSON.stringify(this.monitoringArr));
-            sessionStorage.setItem('monitoringArr', JSON.stringify(this.monitoringArr));
+            // sessionStorage.setItem('monitoringArr', JSON.stringify(this.monitoringArr));
+            Cookies.set('monitoringArr', JSON.stringify(this.monitoringArr));
         });
     }
 };
