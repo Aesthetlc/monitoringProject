@@ -111,6 +111,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import bus from '@/components/common/bus';
 import {
     getAlertTrendingBySeven,
@@ -161,7 +162,7 @@ export default {
                 top: 7,
                 days: 1
             }, //TOP7报警量排行
-            topWarnDataList: [], //top排行数据集合
+            topWarnDataList: [] //top排行数据集合
             // arr: [
             //     {
             //         month: '1',
@@ -201,6 +202,8 @@ export default {
         //     return groups;
         // }, []);
         // console.log(result);
+
+        console.log(this.monitoringArr, '-=-=-=-=-=-=-=-==-');
     },
     components: { Echart },
     mounted() {
@@ -218,7 +221,9 @@ export default {
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
     },
-    computed: {},
+    computed: {
+        ...mapState(['monitoringArr'])
+    },
     methods: {
         // 获取日数据
         async getAlertStatisticDaily() {

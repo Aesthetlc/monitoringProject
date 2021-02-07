@@ -31,7 +31,7 @@
 
 <script>
 import { isvalidPhone } from '@/utils/validate.js'; //表单校验
-import { addUser } from '@/api/cameraManagement.js'; //摄像头类型
+import { addUser } from '@/api/user.js'; //摄像头类型
 export default {
     data() {
         var validatePass = (rule, value, callback) => {
