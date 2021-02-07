@@ -70,13 +70,18 @@ export default {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/cameraManagement',
                     title: '摄像头管理'
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
+                    index: '/home/userManagement',
+                    title: '用户管理'
                 }
             ]
         };
     },
     computed: {
         onRoutes() {
-            return this.$route.path
+            return this.$route.path;
         }
     },
     created() {

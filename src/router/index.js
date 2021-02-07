@@ -44,6 +44,12 @@ export default new Router({
                     meta: { title: '摄像头管理' }
                 },
                 {
+                    name: '用户管理',
+                    path: 'userManagement',
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/userManagement'),
+                    meta: { title: '用户管理' }
+                },
+                {
                     path: '404',
                     component: () => import(/* webpackChunkName: "404" */ '../views/page/404.vue'),
                     meta: { title: '404' }

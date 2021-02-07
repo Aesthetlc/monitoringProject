@@ -31,7 +31,7 @@
                 @selection-change="handleSelectionChange"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
+                <el-table-column type="index"" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="type" label="类型" align="center"></el-table-column>

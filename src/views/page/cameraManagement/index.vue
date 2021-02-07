@@ -52,7 +52,7 @@
                 :default-sort="{ prop: 'id', order: 'ascending' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="id" label="ID" width="60" align="center"></el-table-column>
+                <el-table-column sortable="custom" type="index" label="ID" width="60" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="detectModelType" label="类别" align="center"></el-table-column>
