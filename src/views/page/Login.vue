@@ -23,8 +23,7 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie'
-import { mapMutations } from 'vuex';
+import Cookies from 'js-cookie';
 export default {
     data: function() {
         return {
@@ -39,14 +38,11 @@ export default {
         };
     },
     methods: {
-        ...mapMutations(["addMonitoringArr"]),
         submitForm() {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     this.$message.success('登录成功');
                     Cookies.set('token', this.param.username);
-                    let obj = { a: 1, b: 2 }
-                    this.addMonitoringArr(obj);
                     this.$router.push('/home');
                 } else {
                     this.$message.error('请输入账号和密码');

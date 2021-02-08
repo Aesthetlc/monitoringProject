@@ -111,7 +111,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import bus from '@/components/common/bus';
 import {
     getAlertTrendingBySeven,
@@ -202,8 +201,6 @@ export default {
         //     return groups;
         // }, []);
         // console.log(result);
-
-        console.log(this.monitoringArr, '-=-=-=-=-=-=-=-==-');
     },
     components: { Echart },
     mounted() {
@@ -221,9 +218,7 @@ export default {
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
     },
-    computed: {
-        ...mapState(['monitoringArr'])
-    },
+    computed: {},
     methods: {
         // 获取日数据
         async getAlertStatisticDaily() {

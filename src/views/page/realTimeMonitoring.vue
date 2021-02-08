@@ -3,16 +3,16 @@
         <div class="container">
             <div>
                 <el-form ref="form" inline :model="form" label-width="100px">
-                    <el-form-item label="摄像机ip">
+                    <el-form-item label="摄像机ip" prop="ip">
                         <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item label="摄像机位置">
+                    <el-form-item label="摄像机位置" prop="address">
                         <el-input v-model="form.address" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item label="报警筛选">
-                        <el-select v-model="form.warn" placeholder="筛选条件">
-                            <el-option label="警告1" value="jinggao1"></el-option>
-                            <el-option label="警告2" value="jinggao2"></el-option>
+                    <el-form-item label="报警筛选" prop="type">
+                        <el-select v-model="form.type" placeholder="筛选条件">
+                            <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -23,7 +23,7 @@
             </div>
             <el-button type="primary" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量关闭</el-button>
             <el-table
-                :data="tableData"
+                :data="tableData.slice((pages.limit - 1) * pages.size, pages.limit * pages.size)"
                 border
                 class="table"
                 ref="multipleTable"
@@ -31,7 +31,7 @@
                 @selection-change="handleSelectionChange"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column type="index"" label="ID" width="55" align="center"></el-table-column>
+                <el-table-column type="index" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="type" label="类型" align="center"></el-table-column>
@@ -53,7 +53,7 @@
             <div class="pagination">
                 <el-pagination
                     background
-                    :page-sizes="[5, 10, 15, 20]"
+                    :page-sizes="[10, 20]"
                     layout="total, sizes, prev, pager, next, jumper"
                     :current-page="pages.limit"
                     :page-size="pages.size"
@@ -83,7 +83,10 @@
 </template>
 
 <script>
-import { fetchData } from '../../api/index';
+// import { fetchData } from '../../api/index';
+import { mapState } from 'vuex';
+import { mapMutations } from 'vuex';
+import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
 export default {
     name: 'realTimeMonitoring',
     data() {
@@ -91,15 +94,16 @@ export default {
             form: {
                 ip: '',
                 address: '',
-                warn: 1
+                type: ''
             },
             pages: {
-                total: 5,
+                total: 0,
                 limit: 1,
-                size: 5
+                size: 10
             },
             tableData: [],
             multipleSelection: [],
+            detectModelTypeArray: [], //摄像头检测模型
             delList: [],
             editVisible: false,
             pageTotal: 0,
@@ -108,24 +112,66 @@ export default {
             id: -1
         };
     },
+    computed: {
+        ...mapState(['monitoringArr'])
+    },
     created() {
-        this.getData();
+        this.getTableListData();
+        //检测模型类别查询接口
+        this.getDetectModelsTypes();
+        //获取数据(模拟请求到了数据)
+        let stopTime = setInterval(() => {
+            let obj = {
+                id: 1,
+                ip: '172.23.138.20' + new Date().getTime(),
+                address: '东配楼3F3A1' + new Date().getTime(),
+                type: '指示灯',
+                warnTime: this.$util.timestampToDateTime(new Date().getTime()),
+                thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
+            };
+            if (this.monitoringArr.length >= 20) {
+                this.deleteMonitoringArr();
+                this.addMonitoringArr(obj);
+                // clearInterval(stopTime);
+            } else {
+                this.addMonitoringArr(obj);
+                //获取数据
+                this.getTableListData();
+            }
+        }, 3000);
     },
     methods: {
-        // 获取 easy-mock 的模拟数据
-        async getData() {
-            let res = await fetchData(this.form);
-            this.tableData = res.list;
-            this.pages.total = res.pageTotal || 5;
+        ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
+        //获取数据
+        getTableListData() {
+            this.tableData = this.monitoringArr;
+            this.pages.total = this.tableData.length || 0;
+        },
+        //摄像头检测模型
+        async getDetectModelsTypes() {
+            let { data: res } = await getDetectModelsTypes();
+            res.forEach(item => {
+                this.detectModelTypeArray.push({
+                    value: item.name,
+                    label: item.name
+                });
+            });
         },
         //重置表单
         resetForm() {
-            console.log('resetForm');
+            this.$refs.form.resetFields();
+            this.tableData = this.monitoringArr;
         },
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.pages, 'limit', 1);
-            this.getData();
+            this.tableData = this.tableData.filter(item => {
+                return (
+                    item.ip.search(this.form.ip) > -1 &&
+                    item.address.search(this.form.address) > -1 &&
+                    item.type.search(this.form.type) > -1
+                );
+            });
         },
         // 删除操作
         handleDelete(index, row) {
@@ -168,11 +214,9 @@ export default {
         // 分页导航
         handlePageChange(val) {
             this.$set(this.pages, 'limit', val);
-            this.getData();
         },
         handleSizeChange(val) {
             this.$set(this.pages, 'size', val);
-            this.getData();
         }
     }
 };
