@@ -65,18 +65,24 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
+        <el-dialog title="查看详情" :visible.sync="editVisible" width="30%">
+            <el-form ref="form" :model="showForm" label-width="70px">
+                <el-form-item label="ip">
+                    <el-input v-model="showForm.ip"></el-input>
                 </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
+                <el-form-item label="位置">
+                    <el-input v-model="showForm.address"></el-input>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-input v-model="showForm.type"></el-input>
+                </el-form-item>
+                <el-form-item label="时间">
+                    <el-input v-model="showForm.warnTime"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="editVisible = false">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -107,8 +113,7 @@ export default {
             delList: [],
             editVisible: false,
             pageTotal: 0,
-            form: {},
-            idx: -1,
+            showForm: {},
             id: -1
         };
     },
@@ -199,17 +204,10 @@ export default {
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
         },
-        // 编辑操作
+        // 详情查看
         handleEdit(index, row) {
-            this.idx = index;
-            this.form = row;
+            this.showForm = row;
             this.editVisible = true;
-        },
-        // 保存编辑
-        saveEdit() {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
         },
         // 分页导航
         handlePageChange(val) {
