@@ -58,9 +58,11 @@
                     <!-- 报警量 月 -->
                     <div class="alarmVolumeMes">
                         <div class="alarmVolumeMesLeft">
-                            <div class="alarmVolumeMesLeftNum">3100</div>
+                            <div class="alarmVolumeMesLeftNum">{{ warnMonthNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                月同比 3.2%<em style="color:green" class="el-icon-caret-bottom"></em>
+                                月同比 {{ warnMonthPercentNum }}%
+                                <em v-if="warnMonthPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartMonth" class="alarmVolumeMesRight"></echart>
@@ -222,36 +224,48 @@ export default {
     methods: {
         // 获取日数据
         async getAlertStatisticDaily() {
-            let { data: res } = await getAlertStatisticDaily();
-            this.warnDayNum = res.count;
-            this.warnDayPercentNum = res.percent;
-            //日 柱状图
-            this.chartDayData.data.push(res.series[0].data[0], res.series[1].data[0]);
-            this.chartDayData.yTitle.push(res.series[0].name, res.series[1].name);
-            this.echartData.chartDay = this.drawDay(this.chartDayData.data, this.chartDayData.yTitle);
+            let res = await getAlertStatisticDaily();
+            if (res.code == 0) {
+                this.warnDayNum = res.detail.count;
+                this.warnDayPercentNum = res.detail.percent;
+                //日 柱状图
+                this.chartDayData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
+                this.chartDayData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);
+                this.echartData.chartDay = this.drawDay(this.chartDayData.data, this.chartDayData.yTitle);
+            } else if (res.code == 2) {
+                this.$message.error('系统错误');
+            }
         },
         // 获取周数据
         async getAlertStatisticWeek() {
-            let { data: res } = await getAlertStatisticWeek();
-            this.warnWeekNum = res.count;
-            this.warnWeekPercentNum = res.percent;
-            //周 柱状图
-            this.chartWeekData.data.push(res.series[0].data[0], res.series[1].data[0]);
-            this.chartWeekData.yTitle.push(res.series[0].name, res.series[1].name);
-            this.echartData.chartWeek = this.drawDay(this.chartWeekData.data, this.chartWeekData.yTitle);
+            let res = await getAlertStatisticWeek();
+            if (res.code == 0) {
+                this.warnWeekNum = res.detail.count;
+                this.warnWeekPercentNum = res.detail.percent;
+                //周 柱状图
+                this.chartWeekData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
+                this.chartWeekData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);
+                this.echartData.chartWeek = this.drawDay(this.chartWeekData.data, this.chartWeekData.yTitle);
+            } else if (res.code == 2) {
+                this.$message.error('系统错误');
+            }
         },
         // 获取月数据
         async getAlertStatisticMonth() {
-            let { data: res } = await getAlertStatisticMonth();
-            this.warnMonthNum = res.count;
-            this.warnMonthPercentNum = res.percent;
-            //日 柱状图
-            this.chartMonthData.data.push(res.series[0].data[0], res.series[1].data[0]);
-            this.chartMonthData.yTitle.push(res.series[0].name, res.series[1].name);
-            this.echartData.chartMonth = this.drawDay(this.chartMonthData.data, this.chartMonthData.yTitle);
+            let res = await getAlertStatisticMonth();
+            if (res.code == 0) {
+                this.warnMonthNum = res.detail.count;
+                this.warnMonthPercentNum = res.detail.percent;
+                //月 柱状图
+                this.chartMonthData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
+                this.chartMonthData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);
+                this.echartData.chartMonth = this.drawDay(this.chartMonthData.data, this.chartMonthData.yTitle);
+            } else if (res.code == 2) {
+                this.$message.error('系统错误');
+            }
         },
-        // 获取近7日数据
-        async getAlertTrendingBySeven(params) {
+        // 获取近7日数据    （没有返回数据）
+        async getAlertTrendingBySeven(params) {     
             let { data: res } = await getAlertTrendingBySeven(params);
             res[0].data.forEach(item => {
                 this.alarmingTrendData.data.push(item[1]);
@@ -259,7 +273,7 @@ export default {
             });
             this.echartData.alarmingTrend = this.alarmingTrendBySevenDay(this.alarmingTrendData.data, this.alarmingTrendData.x);
         },
-        // top 排行
+        // top 排行 （没有返回数据）
         async getAlertTrendingTop(params) {
             let { data: res } = await getAlertTrendingTop(params);
             this.topWarnDataList = res;
