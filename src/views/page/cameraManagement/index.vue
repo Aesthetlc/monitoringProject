@@ -53,7 +53,7 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column label="ID" width="60" align="center">
-                    <template scope="scope">
+                    <template slot-scope="scope">
                         <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
                     </template>
                 </el-table-column>
