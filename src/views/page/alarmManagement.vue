@@ -91,7 +91,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <!-- <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form1" label-width="70px">
                 <el-form-item label="ip">
                     <el-input v-model="form1.ip"></el-input>
@@ -104,7 +104,7 @@
                 <el-button @click="editVisible = false">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 
