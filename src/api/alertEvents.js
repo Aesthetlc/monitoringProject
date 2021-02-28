@@ -9,7 +9,7 @@ export function getAlertEventsState(params) {
     });
 }
 
-//根据条件分页展示报警事件信息  --0227(摄像头查询有问题,分页有问题)
+//根据条件分页展示报警事件信息  --0227
 export function getAlertEventsQuery(data) {
     return request({
         url: 'proxy/api/alert-events/query',

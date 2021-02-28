@@ -50,10 +50,10 @@
                 :default-sort="{ prop: 'id', order: 'asc' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column sortable="custom" type="index" label="ID" width="60" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="detectModelType" label="类别" align="center"></el-table-column>
+                <el-table-column type="index" label="ID" width="60" align="center"></el-table-column>
+                <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
+                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
                 <el-table-column
                     sortable="custom"
                     prop="create_time"
@@ -157,7 +157,7 @@ export default {
         let obj = JSON.parse(JSON.stringify(this.form));
         delete obj.sort;
         delete obj.pagenation;
-        this.getAlertEventsCount(obj);
+        // this.getAlertEventsCount(obj);
         //检测模型类别查询接口
         this.getDetectModelsTypes();
     },
@@ -187,13 +187,17 @@ export default {
     methods: {
         //排序
         sortChange(column) {
+            console.log(column.order);
             if (column.order !== null) {
                 this.form.sort.field = column.prop;
-                if (column.order === 'desc') {
+                if (column.order === 'descending') {
                     this.form.sort.type = 'desc';
-                } else if (column.order === 'asc') {
+                } else if (column.order === 'ascending') {
                     this.form.sort.type = 'asc';
                 }
+                let searchObj = JSON.parse(JSON.stringify(this.form));
+                searchObj.createTime = {};
+                this.getAlertEventsQuery(searchObj);
             }
         },
         //获取所有状态信息，用于分类筛选 --0227
@@ -243,12 +247,6 @@ export default {
                 this.$message.error(res.content);
             }
         },
-
-        //报警事件总量查询
-        async getAlertEventsCount(obj) {
-            let { data: res } = await getAlertEventsCount(obj);
-            this.total = res.count || 0;
-        },
         //重置表单
         resetForm(formName) {
             this.$refs[formName].resetFields();
@@ -265,10 +263,10 @@ export default {
             tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
             searchObj.createTime = tempObj;
             this.getAlertEventsQuery(searchObj);
-            let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            // let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
+            // delete obj.sort;
+            // delete obj.pagenation;
+            // this.getAlertEventsCount(obj);
         },
         // 关闭操作
         handleClose(index, row) {
@@ -330,7 +328,7 @@ export default {
                     });
                 });
         },
-        // 分页导航
+        // 分页
         handlePageChange(val) {
             this.$set(this.form.pagenation, 'pageNum', val);
             let searchObj = JSON.parse(JSON.stringify(this.form));
@@ -339,10 +337,10 @@ export default {
             tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
             searchObj.createTime = tempObj;
             this.getAlertEventsQuery(searchObj);
-            let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            // let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
+            // delete obj.sort;
+            // delete obj.pagenation;
+            // this.getAlertEventsCount(obj);
         },
         handleSizeChange(val) {
             this.$set(this.form, 'pageSize', val);
@@ -352,12 +350,11 @@ export default {
             tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
             searchObj.createTime = tempObj;
             this.getAlertEventsQuery(searchObj);
-            let obj = JSON.parse(JSON.stringify(this.form));/// ??????  这个总量有什么用？
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getAlertEventsCount(obj);
+            // let obj = JSON.parse(JSON.stringify(this.form));/// ??????  这个总量有什么用？
+            // delete obj.sort;
+            // delete obj.pagenation;
+            // this.getAlertEventsCount(obj);
         },
-
         // 多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
@@ -371,19 +368,27 @@ export default {
             }
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
-        },
-        // 编辑操作
-        handleEdit(index, row) {
-            this.idx = index;
-            this.form1 = row;
-            this.editVisible = true;
-        },
-        // 保存编辑
-        saveEdit() {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
         }
+
+        // //报警事件总量查询
+        // async getAlertEventsCount(obj) {
+        //     let { data: res } = await getAlertEventsCount(obj);
+        //     this.total = res.count || 0;
+        // },
+
+        // 编辑操作
+        // handleEdit(index, row) {
+        //     this.idx = index;
+        //     this.form1 = row;
+        //     this.editVisible = true;
+        // },
+
+        // 保存编辑
+        // saveEdit() {
+        //     this.editVisible = false;
+        //     this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+        //     this.$set(this.tableData, this.idx, this.form);
+        // }
     }
 };
 </script>
