@@ -196,7 +196,6 @@ export default {
     methods: {
         //排序
         sortChange(column) {
-            console.log(column.order);
             if (column.order !== null) {
                 this.form.sort.field = column.prop;
                 if (column.order === 'descending') {
@@ -204,8 +203,17 @@ export default {
                 } else if (column.order === 'ascending') {
                     this.form.sort.type = 'asc';
                 }
-                let searchObj = JSON.parse(JSON.stringify(this.form));
-                searchObj.createTime = {};
+                let searchObj = {};
+                if (JSON.stringify(this.form.createTime) == '[]') {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    searchObj.createTime = {};
+                } else {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    let tempObj = {};
+                    tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+                    tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+                    searchObj.createTime = tempObj;
+                }
                 this.getAlertEventsQuery(searchObj);
             }
         },
@@ -339,7 +347,6 @@ export default {
         },
         // 分页
         handlePageChange(val) {
-            console.log(2222);
             this.$set(this.form.pagenation, 'pageNum', val);
             let searchObj = JSON.parse(JSON.stringify(this.form));
             let tempObj = {};
@@ -353,7 +360,6 @@ export default {
             // this.getAlertEventsCount(obj);
         },
         handleSizeChange(val) {
-            console.log(111111);
             this.$set(this.form.pagenation, 'pageSize', val);
             let searchObj = JSON.parse(JSON.stringify(this.form));
             let tempObj = {};

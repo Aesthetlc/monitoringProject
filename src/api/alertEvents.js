@@ -18,7 +18,7 @@ export function getAlertEventsQuery(data) {
     });
 }
 
-//单个报警事件关闭  --0227(摄像头关闭了重新刷新 还是没关闭状态)
+//单个报警事件关闭  --0227
 export function closeAlertEventsById(data, id) {
     return request({
         url: `proxy/api/alert-events/${id}/state`,

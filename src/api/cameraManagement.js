@@ -26,39 +26,36 @@ export function getCamerasCount(data) {
     });
 }
 
-//根据id删除指定摄像头
-export function deleteCamerasById(id) {
+//根据摄像机IP查询模型信息接口  --0227
+export function detectModelsCameraByIp(ip) {
     return request({
-        // url: /api/cameras/{id}
-        url: './deleteAlertEventsById.json',
-        method: 'get' //这个位置是delete  等真实的请求来了记得更改
+        url: `proxy/api/detect-models?cameras-ip=${ip}`,
+        method: 'get'
     });
 }
 
-//根据id启动、停止指定摄像头
-export function updateCamerasState(data, id) {
-    return request({
-        // url: /api/cameras/{id}/state
-        url: './camerasState.json',
-        method: 'get', //这个位置是put  等真实的请求来了记得更改
-        data
-    });
-}
-
-//添加需要图像识别的摄像头
+//添加需要图像识别的摄像头  --0227
 export function addCameras(data) {
     return request({
-        url: './cameras.json',
-        method: 'get', //这个位置是post  等真实的请求来了记得更改
+        url: `proxy/api/cameras`,
+        method: 'post',
         data
     });
 }
 
-//根据摄像机IP查询模型信息接口
-export function detectModelsCameraByIp() {
+//根据id删除指定摄像头  --0227
+export function deleteCamerasById(id) {
     return request({
-        // url: /api/detect-models?cameras-ip=ip
-        url: './detectModelsCameraByIp.json',
-        method: 'get'
+        url: `proxy/api/cameras/${id}`,
+        method: 'delete'
+    });
+}
+
+//根据id启动、停止指定摄像头  --0227
+export function updateCamerasState(data, id) {
+    return request({
+        url: `proxy/api/cameras/${id}/state`,
+        method: 'put',
+        data
     });
 }

@@ -25,18 +25,21 @@ export default {
         var checkIp = (rule, value, callback) => {
             const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
             if (!value) {
-                return callback(new Error('摄像头IP不res能为空'));
+                return callback(new Error('摄像头IP不能为空'));
             } else if (!reg.test(value) && value != '') {
                 callback(new Error('请输入正确的IP地址'));
             } else if (value) {
                 setTimeout(() => {
                     detectModelsCameraByIp(value).then(res => {
-                        this.detectModelId = res.data.detectModelId;
-                        this.ruleForm.modelType = res.data.detectModelType;
-                        if (res.content != '请求成功') {
-                            callback(new Error(res.content));
-                        } else {
+                        console.log(res, '---------');
+                        if (res.code == 0) {
+                            this.detectModelId = res.detail.detectModelId;
+                            this.ruleForm.modelType = res.detail.detectModelType;
                             callback();
+                        } else {
+                            //code 1 摄像头已经注册，不能重复注册/摄像头IP为空/摄像头IP格式非法/摄像头模型不存在
+                            //code 2 系统错误
+                            callback(new Error(res.content));
                         }
                     });
                 }, 500);
@@ -69,16 +72,17 @@ export default {
                     let obj = JSON.parse(JSON.stringify(this.ruleForm));
                     delete obj.modelType;
                     obj.detectModelId = this.detectModelId;
-                    console.log(obj);
-                    let { data: res } = await addCameras(obj);
-                    if (res.result === 'success') {
+                    let res = await addCameras(obj);
+                    if (res.code == 0) {
                         this.$message({
                             type: 'success',
                             message: '添加成功!'
                         });
                         this.$emit('closeAddCameraDialog');
                     } else {
-                        this.$message.error('添加失败');
+                        //code 1 摄像头已经注册，不能重复注册/摄像头IP为空/摄像头IP格式非法/摄像头模型不存在/摄像头添加失败
+                        //code 2 系统错误
+                        this.$message.error(res.content);
                     }
                 } else {
                     console.log('error submit!!');

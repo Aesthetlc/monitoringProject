@@ -3,24 +3,24 @@
         <div class="container">
             <div>
                 <el-form ref="form" style="width:100%" inline :model="form" label-width="120px">
-                    <el-form-item style="width:24%" label="摄像机ip">
+                    <el-form-item style="width:24%" label="摄像机ip" prop="ip">
                         <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像机位置">
+                    <el-form-item style="width:24%" label="摄像机位置" prop="position">
                         <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像头筛选">
+                    <el-form-item style="width:24%" label="摄像头筛选" prop="detectModelTypeArray">
                         <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="开启状态">
+                    <el-form-item style="width:24%" label="开启状态" prop="stateArray">
                         <el-select v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="报警时间">
+                    <el-form-item label="报警时间" prop="createTime">
                         <div class="block">
                             <el-date-picker
                                 v-model="form.createTime"
@@ -52,17 +52,27 @@
                 :default-sort="{ prop: 'id', order: 'ascending' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column sortable="custom" type="index" label="ID" width="60" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="detectModelType" label="类别" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="state" label="状态" align="center">
+                <el-table-column label="ID" width="60" align="center">
+                    <template scope="scope">
+                        <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
+                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
+                <el-table-column prop="state" label="状态" align="center">
                     <template slot-scope="scope">
                         <span v-if="scope.row.state">启动</span>
                         <span v-else>停止</span>
                     </template>
                 </el-table-column>
-                <el-table-column sortable="custom" prop="createTime" label="创建时间" align="center"></el-table-column>
+                <el-table-column
+                    sortable="custom"
+                    prop="createTime"
+                    label="创建时间"
+                    align="center"
+                    :formatter="dateFormat"
+                ></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -81,7 +91,7 @@
                     :page-pageSize="form.pageSize"
                     :total="total"
                     @current-change="handlePageChange"
-                    @pageSize-change="handleSizeChange"
+                    @size-change="handleSizeChange"
                 ></el-pagination>
             </div>
         </div>
@@ -109,11 +119,11 @@ export default {
                 stateArray: [], //报警事件开启状态
                 pagenation: {
                     pageNum: 1,
-                    pageSize: 5
+                    pageSize: 10
                 },
                 sort: { field: 'createTime', type: 'asc' } //排序
             },
-            total: 5,
+            total: 0,
             stateArray: [], //状态  启动/关闭
             detectModelTypeArray: [], //摄像头检测模型
             addCameraFlag: false,
@@ -142,7 +152,6 @@ export default {
         this.getDetectModelsTypes();
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
-        
     },
     watch: {
         'form.createTime': {
@@ -171,21 +180,108 @@ export default {
         // 根据条件分页展示报警事件信息    --0227
         async getCamerasQuery(obj) {
             let res = await getCamerasQuery(obj);
-            this.tableData = res.detail;
+            if (res.code == 0) {
+                this.tableData = res.detail;
+            } else {
+                //code 1 摄像头信息查询失败  code 2  系统错误
+                this.$message.error(res.content);
+            }
         },
-        //摄像头总量查询
+        //摄像头检测模型  --0027
+        async getDetectModelsTypes() {
+            let res = await getDetectModelsTypes();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.detectModelTypeArray.push({
+                        value: item.id,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                //模型类型查询失败
+                this.$message.error(res.content);
+            } else if (res.code == 2) {
+                //系统错误
+                this.$message.error(res.content);
+            }
+        },
+        //获取所有状态信息，用于分类筛选 --0227
+        async getAlertEventsState() {
+            let res = await getAlertEventsState();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.stateArray.push({
+                        value: item.code,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                this.$message.error('查询失败');
+            }
+        },
+        //摄像头总量查询 --0227
         async getCamerasCount(obj) {
-            let  res  = await getCamerasCount(obj);
-            console.log(res);
-            this.total = res.count || 5;
+            let res = await getCamerasCount(obj);
+            if (res.code == 0) {
+                this.total = res.detail.count || 0;
+            } else {
+                // code 1  摄像头总数查询失败     code 2 系统错误
+                this.$message.error(res.content);
+            }
         },
+        //表格时间转换 --0227
+        dateFormat(row, column) {
+            const date = this.$util.standardToDateTime(row.createTime);
+            return date;
+        },
+        // 触发搜索按钮 --0227
+        handleSearch() {
+            this.$set(this.form.pagenation, 'pageNum', 1);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
 
-        closeAddCameraDialog() {
-            this.addCameraFlag = false;
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
         },
-        // 关闭添加的弹窗
-        handleCloseDialog() {
-            this.addCameraFlag = false;
+        //排序 --0227
+        sortChange(column) {
+            if (column.order !== null) {
+                this.form.sort.field = column.prop;
+                if (column.order === 'descending') {
+                    this.form.sort.type = 'desc';
+                } else if (column.order === 'ascending') {
+                    this.form.sort.type = 'asc';
+                }
+                let searchObj = {};
+                if (JSON.stringify(this.form.createTime) == '[]') {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    searchObj.createTime = {};
+                } else {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    let tempObj = {};
+                    tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+                    tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+                    searchObj.createTime = tempObj;
+                }
+                this.getCamerasQuery(searchObj);
+            }
+        },
+        //重置表单 --0227
+        resetForm(formName) {
+            this.$refs[formName].resetFields();
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            searchObj.createTime = {};
+            this.getCamerasQuery(searchObj);
         },
         //添加摄像头
         addCamera() {
@@ -195,52 +291,14 @@ export default {
                 this.$refs.addCamera.$refs.ruleForm.resetFields();
             }
         },
-        //批量添加摄像头
-        batchAddCamera() {},
-        //排序
-        sortChange(column) {
-            if (column.order !== null) {
-                this.form.sort.field = column.prop;
-                if (column.order === 'descending') {
-                    this.form.sort.type = 'desc';
-                } else if (column.order === 'ascending') {
-                    this.form.sort.type = 'asc';
-                }
-            }
+        // 关闭添加的弹窗
+        closeAddCameraDialog() {
+            this.addCameraFlag = false;
+            this.resetForm('form');
         },
-        //获取所有状态信息，用于分类筛选
-        async getAlertEventsState() {
-            let { data: res } = await getAlertEventsState();
-            res.forEach(item => {
-                this.stateArray.push({
-                    value: item.code,
-                    label: item.name
-                });
-            });
-        },
-        //摄像头检测模型
-        async getDetectModelsTypes() {
-            let { data: res } = await getDetectModelsTypes();
-            res.forEach(item => {
-                this.detectModelTypeArray.push({
-                    value: item.code,
-                    label: item.name
-                });
-            });
-        },
-
-        //重置表单
-        resetForm() {
-            console.log('resetForm');
-        },
-        // 触发搜索按钮
-        handleSearch() {
-            this.$set(this.form, 'pageNum', 1);
-            this.getCamerasQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getCamerasCount(obj);
+        // 关闭添加的弹窗
+        handleCloseDialog() {
+            this.addCameraFlag = false;
         },
         // 删除操作
         handleDelete(index, row) {
@@ -250,15 +308,17 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    let { data: res } = await deleteCamerasById(row.id);
-                    if (res.result === 'success') {
+                    let res = await deleteCamerasById(row.id);
+                    if (res.code == 0) {
                         this.$message({
                             type: 'success',
                             message: '删除成功!'
                         });
-                        this.tableData.splice(index, 1);
+                        this.resetForm('form');
                     } else {
-                        this.$message.error('删除失败');
+                        //code 1 摄像头删除失败
+                        //code 2 系统错误
+                        this.$message.error(res.content);
                     }
                 })
                 .catch(() => {
@@ -284,16 +344,18 @@ export default {
                 .then(async () => {
                     let closeObj = {
                         state: row.state,
-                        operator: mes === '停止' ? false : true
+                        operator: row.state === true ? 'stop' : 'start'
                     };
-                    let { data: res } = await updateCamerasState(closeObj, row.id);
-                    if (res.result === 'success') {
+                    let res = await updateCamerasState(closeObj, row.id);
+                    if (res.code == 0) {
                         this.$message({
                             type: 'success',
-                            message: '更新成功!'
+                            message: `${mes}成功!`
                         });
                     } else {
-                        this.$message.error('更新失败');
+                        //code 1  摄像头信息查询失败
+                        //code 2 系统错误
+                        this.$message.error(res.content);
                     }
                 })
                 .catch(() => {
@@ -303,37 +365,60 @@ export default {
                     });
                 });
         },
+        // 分页
+        handlePageChange(val) {
+            this.$set(this.form.pagenation, 'pageNum', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
+        },
+        handleSizeChange(val) {
+            this.$set(this.form.pagenation, 'pageSize', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
+        },
+
+        //批量添加摄像头
+        batchAddCamera() {},
         // 多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
-        },
-        delAllSelection() {
-            const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].name + ' ';
-            }
-            this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
-        },
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.form, 'pageNum', val);
-            this.getCamerasQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getCamerasCount(obj);
-        },
-        handleSizeChange(val) {
-            this.$set(this.form, 'pageSize', val);
-            this.getCamerasQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getCamerasCount(obj);
         }
+        // delAllSelection() {
+        //     const length = this.multipleSelection.length;
+        //     let str = '';
+        //     this.delList = this.delList.concat(this.multipleSelection);
+        //     for (let i = 0; i < length; i++) {
+        //         str += this.multipleSelection[i].name + ' ';
+        //     }
+        //     this.$message.error(`删除了${str}`);
+        //     this.multipleSelection = [];
+        // },
     }
 };
 </script>
