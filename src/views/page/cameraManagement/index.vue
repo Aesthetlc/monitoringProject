@@ -34,8 +34,8 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
+                        <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                        <el-button @click="resetForm('form')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -111,7 +111,7 @@ export default {
                     pageNum: 1,
                     pageSize: 5
                 },
-                sort: { field: 'id', type: 'ascending' } //排序
+                sort: { field: 'createTime', type: 'asc' } //排序
             },
             total: 5,
             stateArray: [], //状态  启动/关闭
@@ -127,16 +127,22 @@ export default {
     },
     created() {
         //摄像头分页查询接口
-        this.getCamerasQuery(this.form);
+        let searchObj = JSON.parse(JSON.stringify(this.form));
+        searchObj.createTime = {};
+        this.getCamerasQuery(searchObj);
+        //摄像头分页查询接口 总量
+        let searchCountObj = JSON.parse(JSON.stringify(this.form));
+        searchCountObj.createTime = {};
+        let obj = JSON.parse(JSON.stringify(searchCountObj));
+        delete obj.sort;
+        delete obj.pagenation;
+        this.getCamerasCount(obj);
+
         //检测模型类别查询接口
         this.getDetectModelsTypes();
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
-        //报警事件总量查询
-        let obj = JSON.parse(JSON.stringify(this.form));
-        delete obj.sort;
-        delete obj.pagenation;
-        this.getCamerasCount(obj);
+        
     },
     watch: {
         'form.createTime': {
@@ -162,6 +168,18 @@ export default {
         }
     },
     methods: {
+        // 根据条件分页展示报警事件信息    --0227
+        async getCamerasQuery(obj) {
+            let res = await getCamerasQuery(obj);
+            this.tableData = res.detail;
+        },
+        //摄像头总量查询
+        async getCamerasCount(obj) {
+            let  res  = await getCamerasCount(obj);
+            console.log(res);
+            this.total = res.count || 5;
+        },
+
         closeAddCameraDialog() {
             this.addCameraFlag = false;
         },
@@ -210,16 +228,7 @@ export default {
                 });
             });
         },
-        // 根据条件分页展示报警事件信息
-        async getCamerasQuery(obj) {
-            let { data: res } = await getCamerasQuery(obj);
-            this.tableData = res;
-        },
-        //报警事件总量查询
-        async getCamerasCount(obj) {
-            let { data: res } = await getCamerasCount(obj);
-            this.total = res.count || 5;
-        },
+
         //重置表单
         resetForm() {
             console.log('resetForm');

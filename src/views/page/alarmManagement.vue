@@ -47,10 +47,19 @@
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
                 @sort-change="sortChange"
+                :row-key="
+                    row => {
+                        return row.id;
+                    }
+                "
                 :default-sort="{ prop: 'id', order: 'asc' }"
             >
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column type="index" label="ID" width="60" align="center"></el-table-column>
+                <el-table-column :reserve-selection="true" type="selection" width="55" align="center"></el-table-column>
+                <el-table-column label="ID" width="60" align="center">
+                    <template scope="scope">
+                        <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
@@ -85,7 +94,7 @@
                     :page-pageSize="form.pagenation.pageSize"
                     :total="total"
                     @current-change="handlePageChange"
-                    @pageSize-change="handleSizeChange"
+                    @size-change="handleSizeChange"
                 ></el-pagination>
             </div>
         </div>
@@ -112,9 +121,9 @@
 import {
     getAlertEventsState,
     getAlertEventsQuery,
-    getAlertEventsCount,
     deleteAlertEventsById,
-    closeAlertEventsById
+    closeAlertEventsById,
+    deleteAlertEventsByArr
 } from '@/api/alertEvents.js';
 import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
 export default {
@@ -330,6 +339,7 @@ export default {
         },
         // 分页
         handlePageChange(val) {
+            console.log(2222);
             this.$set(this.form.pagenation, 'pageNum', val);
             let searchObj = JSON.parse(JSON.stringify(this.form));
             let tempObj = {};
@@ -343,7 +353,8 @@ export default {
             // this.getAlertEventsCount(obj);
         },
         handleSizeChange(val) {
-            this.$set(this.form, 'pageSize', val);
+            console.log(111111);
+            this.$set(this.form.pagenation, 'pageSize', val);
             let searchObj = JSON.parse(JSON.stringify(this.form));
             let tempObj = {};
             tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
@@ -359,15 +370,48 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
-        delAllSelection() {
+        async delAllSelection() {
             const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].name + ' ';
+            if (length > 0) {
+                this.$confirm('此操作将永久删除选中的记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                })
+                    .then(async () => {
+                        let delArr = [];
+                        this.delList = this.delList.concat(this.multipleSelection);
+                        for (let i = 0; i < length; i++) {
+                            delArr.push(this.multipleSelection[i].id);
+                        }
+                        let res = await deleteAlertEventsByArr({
+                            idsArray: delArr
+                        });
+                        console.log(res);
+                        if (res.code == 0) {
+                            this.$message({
+                                type: 'success',
+                                message: '批量删除成功!'
+                            });
+                            this.multipleSelection = [];
+                            this.resetForm('form');
+                        } else if (res.code == 1) {
+                            //删除失败
+                            this.$message.error('批量删除失败');
+                        }
+                    })
+                    .catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+            } else {
+                this.$message({
+                    message: '请选择数据后再进行此操作',
+                    type: 'warning'
+                });
             }
-            this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
         }
 
         // //报警事件总量查询

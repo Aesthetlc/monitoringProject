@@ -8,20 +8,20 @@ export function getDetectModelsTypes() {
     });
 }
 
-//摄像头分页查询接口
+//摄像头分页查询接口  --0227
 export function getCamerasQuery(data) {
     return request({
-        url: './camerasQuery.json',
-        method: 'get', //这个位置是post  等真实的请求来了记得更改
+        url: 'proxy/api/cameras/query',
+        method: 'post',
         data
     });
 }
 
-//根据条件分页展示摄像头总数
+//根据条件分页展示摄像头总数 --0227
 export function getCamerasCount(data) {
     return request({
-        url: './camerasCount.json',
-        method: 'get', //这个位置是post  等真实的请求来了记得更改
+        url: 'proxy/api/cameras/count',
+        method: 'post',
         data
     });
 }

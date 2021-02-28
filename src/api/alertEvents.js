@@ -35,11 +35,11 @@ export function deleteAlertEventsById(id) {
     });
 }
 
-//报警事件总量查询接口
-export function getAlertEventsCount(data) {
-    return request({
-        url: './alertEventsCount.json',
-        method: 'get', //这个位置是post  等真实的请求来了记得更改
-        data
-    });
+//报警事件批量删除  --0227
+export function deleteAlertEventsByArr(data) {
+  return request({
+      url: `proxy/api/alert-events/batchDelAlertEvent`,
+      method: 'post',
+      data
+  });
 }
