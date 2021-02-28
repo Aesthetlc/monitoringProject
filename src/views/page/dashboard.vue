@@ -93,17 +93,24 @@
                     </div>
                     <!-- 近7日报警趋势 -->
                     <div class="alarmingTrendBySevenDay">
-                        <div v-for="(item, index) in topWarnDataList" class="alarmingTrendBySevenDayMes">
-                            <div style="display:flex">
-                                <div
-                                    class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
-                                >
-                                    {{ index + 1 }}
+                        <div v-if="topWarnDataList.length > 0">
+                            <div v-for="(item, index) in topWarnDataList" class="alarmingTrendBySevenDayMes">
+                                <div style="display:flex">
+                                    <div
+                                        class="alarmingTrendBySevenDayMesLeft"
+                                        :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
+                                    >
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div>{{ item.name }}</div>
                                 </div>
-                                <div>{{ item.name }}</div>
+                                <div style="margin-right:10px">{{ item.count }}</div>
                             </div>
-                            <div style="margin-right:10px">{{ item.count }}</div>
+                        </div>
+                        <div v-else>
+                            <div style="margin-top:10px">
+                                <span>暂无数据</span>
+                            </div>
                         </div>
                     </div>
                 </el-card>
@@ -264,19 +271,27 @@ export default {
                 this.$message.error('系统错误');
             }
         },
-        // 获取近7日数据    （没有返回数据）
-        async getAlertTrendingBySeven(params) {     
-            let { data: res } = await getAlertTrendingBySeven(params);
-            res[0].data.forEach(item => {
-                this.alarmingTrendData.data.push(item[1]);
-                this.alarmingTrendData.x.push(item[0]);
-            });
-            this.echartData.alarmingTrend = this.alarmingTrendBySevenDay(this.alarmingTrendData.data, this.alarmingTrendData.x);
+        // 获取近7日数据
+        async getAlertTrendingBySeven(params) {
+            let res = await getAlertTrendingBySeven(params);
+            if (res.code == 0) {
+                res.detail[0].data.forEach(item => {
+                    this.alarmingTrendData.data.push(item[1]);
+                    this.alarmingTrendData.x.push(item[0]);
+                });
+                this.echartData.alarmingTrend = this.alarmingTrendBySevenDay(this.alarmingTrendData.data, this.alarmingTrendData.x);
+            } else if (res.code == 1) {
+                this.$message.error('系统错误');
+            }
         },
-        // top 排行 （没有返回数据）
+        // top 排行
         async getAlertTrendingTop(params) {
-            let { data: res } = await getAlertTrendingTop(params);
-            this.topWarnDataList = res;
+            let res = await getAlertTrendingTop(params);
+            if (res.code == 0) {
+                this.topWarnDataList = res.detail;
+            } else if (res.code == 1) {
+                this.$message.error('系统错误');
+            }
         },
         // 更改top日期
         changeTopDate(val) {

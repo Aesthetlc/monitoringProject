@@ -24,19 +24,19 @@ export function getAlertStatisticMonth() {
     });
 }
 
-//获取近7日数据  --0227  （没有返回数据）
+//获取近7日数据  --0227
 export function getAlertTrendingBySeven(params) {
     return request({
-        url: './alertTrending.json',
+        url: 'proxy/api/home-page/alert-trending',
         method: 'get',
         params
     });
 }
 
-//获取近7日数据    --0227  （没有返回数据）
+//获取近7日数据  --0227
 export function getAlertTrendingTop(params) {
     return request({
-        url: './topRanking.json',
+        url: 'proxy/api/home-page/top-ranking',
         method: 'get',
         params
     });

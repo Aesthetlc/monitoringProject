@@ -3,24 +3,24 @@
         <div class="container">
             <div>
                 <el-form ref="form" style="width:100%" inline :model="form" label-width="120px">
-                    <el-form-item style="width:24%" label="摄像机ip">
+                    <el-form-item style="width:24%" label="摄像机ip" prop="ip">
                         <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像机位置">
+                    <el-form-item style="width:24%" label="摄像机位置" prop="position">
                         <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像头筛选">
-                        <el-select  v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                    <el-form-item style="width:24%" label="摄像头筛选" prop="detectModelTypeArray">
+                        <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="开启状态">
+                    <el-form-item style="width:24%" label="开启状态" prop="stateArray">
                         <el-select v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="报警时间">
+                    <el-form-item label="报警时间" prop="createTime">
                         <div class="block">
                             <el-date-picker
                                 v-model="form.createTime"
@@ -33,8 +33,8 @@
                         </div>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
+                        <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                        <el-button @click="resetForm('form')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -47,14 +47,20 @@
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
                 @sort-change="sortChange"
-                :default-sort="{ prop: 'id', order: 'ascending' }"
+                :default-sort="{ prop: 'id', order: 'asc' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column sortable="custom" type="index" label="ID" width="60" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column sortable="custom" prop="detectModelType" label="类别" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="createTime" label="报警时间" align="center"></el-table-column>
+                <el-table-column
+                    sortable="custom"
+                    prop="create_time"
+                    label="报警时间"
+                    align="center"
+                    :formatter="dateFormat"
+                ></el-table-column>
 
                 <el-table-column label="缩略图" align="center">
                     <template slot-scope="scope">
@@ -75,8 +81,8 @@
                     background
                     :page-sizes="[5, 10, 15, 20]"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :current-page="form.pageNum"
-                    :page-pageSize="form.pageSize"
+                    :current-page="form.pagenation.pageNum"
+                    :page-pageSize="form.pagenation.pageSize"
                     :total="total"
                     @current-change="handlePageChange"
                     @pageSize-change="handleSizeChange"
@@ -121,13 +127,13 @@ export default {
                 stateArray: [], //报警事件开启状态
                 detectModelTypeArray: [], //摄像头检测模型
                 createTime: [], //报警事件创建时间
-                sort: { field: 'id', type: 'ascending' }, //排序
+                sort: { field: 'id', type: 'asc' }, //排序
                 pagenation: {
                     pageNum: 1,
-                    pageSize: 5
+                    pageSize: 10
                 }
             },
-            total: 5,
+            total: 0,
             stateArray: [], //状态  启动/关闭
             detectModelTypeArray: [], //摄像头检测模型
             form1: {}, //弹窗对象form
@@ -143,7 +149,10 @@ export default {
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
         //根据条件分页展示报警事件信息
-        this.getAlertEventsQuery(this.form);
+        let searchObj = JSON.parse(JSON.stringify(this.form));
+        searchObj.createTime = {};
+        this.getAlertEventsQuery(searchObj);
+
         //报警事件总量查询
         let obj = JSON.parse(JSON.stringify(this.form));
         delete obj.sort;
@@ -153,17 +162,17 @@ export default {
         this.getDetectModelsTypes();
     },
     watch: {
-        'form.createTime': {
-            handler(newVal, oldVal) {
-                let obj = {};
-                // obj.startTime = timeFormat(newVal[0]);
-                // obj.endTime = timeFormat(newVal[1]);
-                // console.log(obj);
-                obj.startTime = this.$util.timestampToDateTime(newVal[0]);
-                obj.endTime = this.$util.timestampToDateTime(newVal[1]);
-                console.log(obj);
-            }
-        },
+        // createTime: {
+        //     handler(newVal, oldVal) {
+        //         let obj = {};
+        //         // obj.startTime = timeFormat(newVal[0]);
+        //         // obj.endTime = timeFormat(newVal[1]);
+        //         // console.log(obj);
+        //         obj.startTime = this.$util.timestampToDateTime(newVal[0]);
+        //         obj.endTime = this.$util.timestampToDateTime(newVal[1]);
+        //         this.form.createTime = obj;
+        //     }
+        // },
         'form.detectModelTypeArray': {
             handler(newVal, oldVal) {
                 console.log(newVal);
@@ -180,55 +189,118 @@ export default {
         sortChange(column) {
             if (column.order !== null) {
                 this.form.sort.field = column.prop;
-                if (column.order === 'descending') {
+                if (column.order === 'desc') {
                     this.form.sort.type = 'desc';
-                } else if (column.order === 'ascending') {
+                } else if (column.order === 'asc') {
                     this.form.sort.type = 'asc';
                 }
             }
         },
-        //获取所有状态信息，用于分类筛选
+        //获取所有状态信息，用于分类筛选 --0227
         async getAlertEventsState() {
-            let { data: res } = await getAlertEventsState();
-            res.forEach(item => {
-                this.stateArray.push({
-                    value: item.code,
-                    label: item.name
+            let res = await getAlertEventsState();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.stateArray.push({
+                        value: item.code,
+                        label: item.name
+                    });
                 });
-            });
+            } else if (res.code == 1) {
+                this.$message.error('查询失败');
+            }
         },
-        //摄像头检测模型
-        async getDetectModelsTypes() {
-            let { data: res } = await getDetectModelsTypes();
-            res.forEach(item => {
-                this.detectModelTypeArray.push({
-                    value: item.code,
-                    label: item.name
-                });
-            });
-        },
-        // 根据条件分页展示报警事件信息
+        // 根据条件分页展示报警事件信息 --0227
         async getAlertEventsQuery(obj) {
-            let { data: res } = await getAlertEventsQuery(obj);
-            this.tableData = res;
+            let res = await getAlertEventsQuery(obj);
+            if (res.code == 0) {
+                this.tableData = res.detail;
+                this.total = res.totalCounts || 0;
+            } else if (res.code == 1) {
+                this.$message.error('查询失败');
+            }
         },
+        //表格时间转换 --0227
+        dateFormat(row, column) {
+            const date = this.$util.standardToDateTime(row.create_time);
+            return date;
+        },
+        //摄像头检测模型  --0027
+        async getDetectModelsTypes() {
+            let res = await getDetectModelsTypes();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.detectModelTypeArray.push({
+                        value: item.id,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                //模型类型查询失败
+                this.$message.error(res.content);
+            } else if (res.code == 2) {
+                //系统错误
+                this.$message.error(res.content);
+            }
+        },
+
         //报警事件总量查询
         async getAlertEventsCount(obj) {
             let { data: res } = await getAlertEventsCount(obj);
-            this.total = res.count || 5;
+            this.total = res.count || 0;
         },
         //重置表单
-        resetForm() {
-            console.log('resetForm');
+        resetForm(formName) {
+            this.$refs[formName].resetFields();
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            searchObj.createTime = {};
+            this.getAlertEventsQuery(searchObj);
         },
         // 触发搜索按钮
         handleSearch() {
-            this.$set(this.form, 'pageNum', 1);
-            this.getAlertEventsQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
+            this.$set(this.form.pagenation, 'pageNum', 1);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getAlertEventsQuery(searchObj);
+            let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
             delete obj.sort;
             delete obj.pagenation;
             this.getAlertEventsCount(obj);
+        },
+        // 关闭操作
+        handleClose(index, row) {
+            this.$confirm('您是否要关闭该摄像头警告?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(async () => {
+                    let closeObj = {
+                        state: row.state,
+                        operator: 'stop'
+                    };
+                    let res = await closeAlertEventsById(closeObj, row.id);
+                    if (res.code == 0) {
+                        this.$message({
+                            type: 'success',
+                            message: '摄像头关闭成功!'
+                        });
+
+                        this.resetForm('form');
+                    } else if (res.code == 1) {
+                        //摄像头关闭失败
+                        this.$message.error(res.content);
+                    }
+                })
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消关闭操作'
+                    });
+                });
         },
         // 删除操作
         handleDelete(index, row) {
@@ -238,14 +310,16 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    let { data: res } = await deleteAlertEventsById(row.id);
-                    if (res.result === 'success') {
+                    let res = await deleteAlertEventsById(row.id);
+                    if (res.code == 0) {
                         this.$message({
                             type: 'success',
                             message: '删除成功!'
                         });
-                        this.tableData.splice(index, 1);
-                    } else {
+                        // this.tableData.splice(index, 1);
+                        this.resetForm('form');
+                    } else if (res.code == 1) {
+                        //删除失败
                         this.$message.error('删除失败');
                     }
                 })
@@ -256,35 +330,34 @@ export default {
                     });
                 });
         },
-        // 关闭操作
-        handleClose(index, row) {
-            this.$confirm('您是否要关闭该事件警告?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            })
-                .then(async () => {
-                    let closeObj = {
-                        state: row.state,
-                        operator: 'stop'
-                    };
-                    let { data: res } = await closeAlertEventsById(closeObj, row.id);
-                    if (res.result === 'success') {
-                        this.$message({
-                            type: 'success',
-                            message: '关闭成功!'
-                        });
-                    } else {
-                        this.$message.error('关闭失败');
-                    }
-                })
-                .catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消关闭'
-                    });
-                });
+        // 分页导航
+        handlePageChange(val) {
+            this.$set(this.form.pagenation, 'pageNum', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getAlertEventsQuery(searchObj);
+            let obj = JSON.parse(JSON.stringify(this.form)); /// ??????  这个总量有什么用？
+            delete obj.sort;
+            delete obj.pagenation;
+            this.getAlertEventsCount(obj);
         },
+        handleSizeChange(val) {
+            this.$set(this.form, 'pageSize', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getAlertEventsQuery(searchObj);
+            let obj = JSON.parse(JSON.stringify(this.form));/// ??????  这个总量有什么用？
+            delete obj.sort;
+            delete obj.pagenation;
+            this.getAlertEventsCount(obj);
+        },
+
         // 多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
@@ -310,23 +383,6 @@ export default {
             this.editVisible = false;
             this.$message.success(`修改第 ${this.idx + 1} 行成功`);
             this.$set(this.tableData, this.idx, this.form);
-        },
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.form, 'pageNum', val);
-            this.getAlertEventsQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getAlertEventsCount(obj);
-        },
-        handleSizeChange(val) {
-            this.$set(this.form, 'pageSize', val);
-            this.getAlertEventsQuery(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getAlertEventsCount(obj);
         }
     }
 };

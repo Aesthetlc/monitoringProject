@@ -1,9 +1,9 @@
 import request from '../utils/request';
 
-//检测模型类别查询接口
+//检测模型类别查询接口  --0227
 export function getDetectModelsTypes() {
     return request({
-        url: './detectModelsTypes.json',
+        url: 'proxy/api/detect-models/types',
         method: 'get'
     });
 }
