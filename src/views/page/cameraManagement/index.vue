@@ -282,6 +282,15 @@ export default {
             let searchObj = JSON.parse(JSON.stringify(this.form));
             searchObj.createTime = {};
             this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            this.getCamerasCount(searchCountObj);
         },
         //添加摄像头
         addCamera() {
@@ -352,6 +361,7 @@ export default {
                             type: 'success',
                             message: `${mes}成功!`
                         });
+                        this.resetForm('form');
                     } else {
                         //code 1  摄像头信息查询失败
                         //code 2 系统错误
