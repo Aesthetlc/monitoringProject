@@ -2,21 +2,21 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" style="width:100%" inline :model="form" label-width="120px">
-                    <el-form-item style="width:24%" label="摄像机ip" prop="ip">
-                        <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
+                    <el-form-item label="摄像机ip" prop="ip">
+                        <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像机位置" prop="position">
-                        <el-input v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                    <el-form-item label="摄像机位置" prop="position">
+                        <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="摄像头筛选" prop="detectModelTypeArray">
-                        <el-select v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                    <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                        <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item style="width:24%" label="开启状态" prop="stateArray">
-                        <el-select v-model="form.stateArray" multiple placeholder="筛选状态">
+                    <el-form-item label="开启状态" prop="stateArray">
+                        <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                         </el-select>
                     </el-form-item>

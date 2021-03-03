@@ -2,15 +2,15 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" inline :model="form" label-width="100px">
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="100px">
                     <el-form-item label="摄像机ip" prop="ip">
-                        <el-input v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                        <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像机位置" prop="address">
-                        <el-input v-model="form.address" placeholder="请输入摄像机位置"></el-input>
+                        <el-input style="width:100%" v-model="form.address" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
                     <el-form-item label="报警筛选" prop="type">
-                        <el-select v-model="form.type" placeholder="筛选条件">
+                        <el-select style="width:100%" v-model="form.type" placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>

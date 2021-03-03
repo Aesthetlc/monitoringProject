@@ -3,40 +3,54 @@
         <div class="container">
             <div>
                 <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
-                    <div id="searchBox">
-                        <el-form-item label="摄像机ip" prop="ip">
-                            <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
-                        </el-form-item>
-                        <el-form-item label="摄像机位置" prop="position">
-                            <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
-                        </el-form-item>
-                        <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                            <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
-                                <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="开启状态" prop="stateArray">
-                            <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
-                                <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="报警时间" prop="createTime">
-                            <div class="block">
-                                <el-date-picker
-                                    v-model="form.createTime"
-                                    type="datetimerange"
-                                    range-separator="至"
-                                    start-placeholder="开始日期"
-                                    end-placeholder="结束日期"
-                                >
-                                </el-date-picker>
-                            </div>
-                        </el-form-item>
+                    <el-collapse-transition>
+                        <div v-show="showAll" id="searchBox">
+                            <el-form-item label="摄像机ip" prop="ip">
+                                <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                            </el-form-item>
+                            <el-form-item label="摄像机位置" prop="position">
+                                <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                            </el-form-item>
+                            <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                                <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                                    <el-option
+                                        v-for="item in detectModelTypeArray"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    >
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="开启状态" prop="stateArray">
+                                <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
+                                    <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="报警时间" prop="createTime">
+                                <div class="block">
+                                    <el-date-picker
+                                        v-model="form.createTime"
+                                        type="datetimerange"
+                                        range-separator="至"
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期"
+                                    >
+                                    </el-date-picker>
+                                </div>
+                            </el-form-item>
+                        </div>
+                    </el-collapse-transition>
+
+                    <div style="text-align:right">
                         <el-form-item>
                             <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
                             <el-button @click="resetForm('form')">重置</el-button>
+                            <el-button type="text" style="margin-left:10px" id="closeSearchBtn" @click="closeSearch">
+                                {{ word }}
+                                <i :class="showAll ? 'el-icon-arrow-up ' : 'el-icon-arrow-down'"></i>
+                            </el-button>
                         </el-form-item>
                     </div>
                 </el-form>
@@ -106,6 +120,7 @@
 </template>
 
 <script>
+import animate from 'animate.css';
 import { getAlertEventsState } from '@/api/alertEvents.js';
 import { getDetectModelsTypes, getCamerasQuery, getCamerasCount, deleteCamerasById, updateCamerasState } from '@/api/cameraManagement.js'; //摄像头类型
 import addCamera from '@/views/page/cameraManagement/addCamera.vue';
@@ -132,11 +147,24 @@ export default {
             tableData: [],
             multipleSelection: [],
             delList: [],
-            showAll: true //是否展开全部
+            showAll: false //是否展开全部
         };
     },
-    computed: {},
-    mounted() {},
+    computed: {
+        word: function() {
+            if (this.showAll == false) {
+                //对文字进行处理
+                return '展开搜索';
+            } else {
+                return '收起搜索';
+            }
+        }
+    },
+    mounted() {
+        this.$nextTick(function() {
+            this.closeSearch();
+        });
+    },
     components: {
         addCamera
     },
@@ -182,6 +210,16 @@ export default {
         }
     },
     methods: {
+        closeSearch() {
+            this.showAll = !this.showAll;
+            var searchBoxHeght = document.getElementById('searchBox');
+            var bbb = document.getElementById('aaa');
+            if (this.showAll == false) {
+                searchBoxHeght.style.height = 50 + 'px';
+            } else {
+                searchBoxHeght.style.height = 'auto';
+            }
+        },
         // 根据条件分页展示报警事件信息    --0227
         async getCamerasQuery(obj) {
             let res = await getCamerasQuery(obj);

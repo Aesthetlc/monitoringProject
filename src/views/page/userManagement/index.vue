@@ -2,24 +2,25 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" style="width:100%" inline :model="form" label-width="120px">
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="120px">
                     <div>
-                        <el-form-item label="用户名">
-                            <el-input v-model="form.userName" placeholder="请输入用户名"></el-input>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input style="width:100%" v-model="form.username" placeholder="请输入用户名"></el-input>
                         </el-form-item>
-                        <el-form-item label="手机号">
-                            <el-input v-model="form.phone" placeholder="请输入手机号"></el-input>
+                        <el-form-item label="手机号" prop="mobilephone">
+                            <el-input style="width:100%" v-model="form.mobilephone" placeholder="请输入手机号"></el-input>
                         </el-form-item>
-                        <el-form-item label="权限筛选">
-                            <el-select v-model="form.power" placeholder="筛选条件">
+                        <el-form-item label="权限筛选" prop="power">
+                            <el-select style="width:100%" v-model="form.power" placeholder="筛选条件">
                                 <el-option v-for="item in powerArr" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="创建时间">
+                        <el-form-item label="创建时间" prop="createTime">
                             <div class="block">
                                 <el-date-picker
+                                    style="width:100%"
                                     v-model="form.createTime"
-                                    type="daterange"
+                                    type="datetimerange"
                                     range-separator="至"
                                     start-placeholder="开始日期"
                                     end-placeholder="结束日期"
@@ -30,8 +31,8 @@
                     </div>
                     <div style="text-align:right">
                         <el-form-item>
-                            <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
-                            <el-button @click="resetForm('ruleForm')">重置</el-button>
+                            <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                            <el-button @click="resetForm('form')">重置</el-button>
                         </el-form-item>
                     </div>
                 </el-form>
@@ -48,12 +49,28 @@
                 :default-sort="{ prop: 'id', order: 'ascending' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column sortable="custom" type="index" label="序号" width="60" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="userName" label="用户名" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="name" label="姓名" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="phone" label="手机号" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="power" label="权限" align="center"></el-table-column>
-                <el-table-column sortable="custom" prop="createTime" label="创建时间" align="center"></el-table-column>
+                <el-table-column label="序号" width="60" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="username" label="用户名" align="center"></el-table-column>
+                <el-table-column prop="fullname" label="姓名" align="center"></el-table-column>
+                <el-table-column prop="mobilephone" label="手机号" align="center"></el-table-column>
+                <el-table-column prop="user_role_id" label="权限" align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.user_role_id == 1">管理员</span>
+                        <span v-else-if="scope.row.user_role_id == 2">普通用户</span>
+                        <span v-else>未知</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    sortable="custom"
+                    :formatter="dateFormat"
+                    prop="create_time"
+                    label="创建时间"
+                    align="center"
+                ></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -66,11 +83,11 @@
                     background
                     :page-sizes="[5, 10, 15, 20]"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :current-page="form.pageNum"
-                    :page-pageSize="form.pageSize"
+                    :current-page="form.pagenation.pageNum"
+                    :page-pageSize="form.pagenation.pageSize"
                     :total="total"
                     @current-change="handlePageChange"
-                    @pageSize-change="handleSizeChange"
+                    @size-change="handleSizeChange"
                 ></el-pagination>
             </div>
         </div>
@@ -83,22 +100,22 @@
 </template>
 
 <script>
-import { getUserAll, getUserCount, deleteUserById } from '@/api/user.js';
+import { getUserAll, deleteUserById } from '@/api/user.js';
 import addUser from '@/views/page/userManagement/addUser.vue';
 export default {
     name: 'userManagement',
     data() {
         return {
             form: {
-                userName: '', //用户名
-                phone: '', //手机号
-                power: [], //权限
+                username: '', //用户名
+                mobilephone: '', //手机号
                 createTime: [], //报警事件创建时间
                 pagenation: {
                     pageNum: 1,
-                    pageSize: 5
+                    pageSize: 10
                 },
-                sort: { field: 'id', type: 'ascending' } //排序
+                sort: { field: 'create_time', type: 'asc' } //排序
+                // power: [], //权限
             },
             powerArr: [
                 {
@@ -110,7 +127,7 @@ export default {
                     label: '管理员'
                 }
             ], //权限数组
-            total: 5, // 总条数
+            total: 0, // 总条数
             tableData: [], //表格数据
             addUserFlag: false,
             multipleSelection: [],
@@ -121,13 +138,10 @@ export default {
         addUser
     },
     created() {
+        let searchObj = JSON.parse(JSON.stringify(this.form));
+        searchObj.createTime = {};
         //用户分页查询接口
-        this.getUserAll(this.form);
-        //报警事件总量查询
-        let obj = JSON.parse(JSON.stringify(this.form));
-        delete obj.sort;
-        delete obj.pagenation;
-        this.getUserCount(obj);
+        this.getUserAll(searchObj);
     },
     watch: {
         'form.createTime': {
@@ -148,23 +162,57 @@ export default {
         }
     },
     methods: {
+        // 根据条件分页展示用户信息   --0227
+        async getUserAll(obj) {
+            let res = await getUserAll(obj);
+            if (res.code == 0) {
+                this.tableData = res.detail;
+                this.total = res.totalCounts;
+            } else {
+                //code 1
+                this.$error.message(res.content);
+            }
+        },
+        //表格时间转换 --0227
+        dateFormat(row, column) {
+            const date = this.$util.standardToDateTime(row.create_time);
+            return date;
+        },
+        // 触发搜索按钮  --0227
+        handleSearch() {
+            this.$set(this.form.pagenation, 'pageNum', 1);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getUserAll(searchObj);
+        },
+        //重置表单 --0227
+        resetForm(formName) {
+            this.$refs[formName].resetFields();
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            searchObj.createTime = {};
+            this.getUserAll(searchObj);
+        },
+        //添加用户  --0227
+        addUser() {
+            this.addUserFlag = true;
+            if (this.$refs.addUser) {
+                this.$refs.addUser.$refs.ruleForm.clearValidate();
+                this.$refs.addUser.$refs.ruleForm.resetFields();
+            }
+        },
+        // 添加成功之后关闭弹窗
         closeAddUserDialog() {
             this.addUserFlag = false;
+            this.resetForm('form');
         },
         // 关闭添加的弹窗
         handleCloseDialog() {
             this.addUserFlag = false;
         },
-        //添加摄像头
-        addUser() {
-            this.addUserFlag = true;
-            if (this.$refs.addUser) {
-                this.$refs.addUser.$refs.formData.clearValidate();
-                this.$refs.addUser.$refs.formData.resetFields();
-            }
-        },
-        //批量添加摄像头
-        batchAddCamera() {},
+
         //排序
         sortChange(column) {
             if (column.order !== null) {
@@ -176,44 +224,40 @@ export default {
                 }
             }
         },
-        // 根据条件分页展示报警事件信息
-        async getUserAll(obj) {
-            let { data: res } = await getUserAll(obj);
-            this.tableData = res;
+        // 分页导航
+        handlePageChange(val) {
+            this.$set(this.form.pagenation, 'pageNum', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getUserAll(searchObj);
         },
-        //报警事件总量查询
-        async getUserCount(obj) {
-            let { data: res } = await getUserCount(obj);
-            this.total = res.count || 5;
-        },
-        //重置表单
-        resetForm() {
-            console.log('resetForm');
-        },
-        // 触发搜索按钮
-        handleSearch() {
-            this.$set(this.form, 'pageNum', 1);
-            this.getUserAll(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getUserCount(obj);
+        handleSizeChange(val) {
+            this.$set(this.form.pagenation, 'pageSize', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getUserAll(searchObj);
         },
         // 删除操作
         handleDelete(index, row) {
-            this.$confirm('此操作将永久删除该条记录, 是否继续?', '提示', {
+            this.$confirm('此操作将永久删除该条用户, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             })
                 .then(async () => {
-                    let { data: res } = await deleteUserById(row.id);
-                    if (res.result === 'success') {
+                    let res = await deleteUserById(row.id);
+                    if (res.code === '0') {
                         this.$message({
                             type: 'success',
                             message: '删除成功!'
                         });
-                        this.tableData.splice(index, 1);
+                        this.resetForm('form');
                     } else {
                         this.$message.error('删除失败');
                     }
@@ -225,6 +269,7 @@ export default {
                     });
                 });
         },
+
         // 多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
@@ -238,23 +283,6 @@ export default {
             }
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
-        },
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.form, 'pageNum', val);
-            this.getUserAll(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getUserCount(obj);
-        },
-        handleSizeChange(val) {
-            this.$set(this.form, 'pageSize', val);
-            this.getUserAll(this.form);
-            let obj = JSON.parse(JSON.stringify(this.form));
-            delete obj.sort;
-            delete obj.pagenation;
-            this.getUserCount(obj);
         }
     }
 };
