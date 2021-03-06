@@ -89,8 +89,8 @@
                     background
                     :page-sizes="[5, 10, 15, 20]"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :current-page="form.pageNum"
-                    :page-pageSize="form.pageSize"
+                    :current-page="form.pagenation.pageNum"
+                    :page-pageSize="form.pagenation.pageSize"
                     :total="total"
                     @current-change="handlePageChange"
                     @size-change="handleSizeChange"

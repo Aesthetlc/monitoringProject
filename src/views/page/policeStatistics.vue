@@ -1,11 +1,119 @@
 <template>
     <div>
-        <el-row :gutter="20" style="padding-left:10px;padding-right:10px;margin-bottom:0px">
-            <el-col :span="24" style="text-align:right">
+        <el-row :gutter="20" style="padding:0px;margin-left:10px;margin-right:10px;margin-bottom:10px">
+            <el-card>
+                <div style="text-align:right;margin-top:-20px">
+                    <el-button type="text" style="margin-left:10px" id="closeSearchBtn" @click="closeSearch">
+                        {{ word }}
+                        <i :class="showAll ? 'el-icon-arrow-up ' : 'el-icon-arrow-down'"></i>
+                    </el-button>
+                </div>
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
+                    <div id="searchBox">
+                        <el-form-item label="摄像机ip" prop="ip">
+                            <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                        </el-form-item>
+                        <el-form-item label="摄像机位置" prop="position">
+                            <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                        </el-form-item>
+                        <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                            <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                                <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="开启状态" prop="stateArray">
+                            <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
+                                <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="报警时间" prop="createTime">
+                            <div class="block">
+                                <el-date-picker
+                                    v-model="form.createTime"
+                                    type="datetimerange"
+                                    range-separator="至"
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期"
+                                >
+                                </el-date-picker>
+                            </div>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                            <el-button @click="resetForm('form')">重置</el-button>
+                        </el-form-item>
+                        <el-table
+                            :data="tableData"
+                            border
+                            class="table"
+                            ref="multipleTable"
+                            header-cell-class-name="table-header"
+                            @selection-change="handleSelectionChange"
+                            @sort-change="sortChange"
+                            :row-key="
+                                row => {
+                                    return row.id;
+                                }
+                            "
+                            :default-sort="{ prop: 'id', order: 'ascending' }"
+                        >
+                            <el-table-column :reserve-selection="true" type="selection" width="55" align="center"></el-table-column>
+                            <el-table-column label="ID" width="60" align="center">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
+                            <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                            <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
+                            <el-table-column prop="state" label="状态" align="center">
+                                <template slot-scope="scope">
+                                    <span v-if="scope.row.state">启动</span>
+                                    <span v-else>停止</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                sortable="custom"
+                                prop="createTime"
+                                label="创建时间"
+                                align="center"
+                                :formatter="dateFormat"
+                            ></el-table-column>
+                        </el-table>
+                        <div class="pagination">
+                            <el-pagination
+                                background
+                                :page-sizes="[5, 10, 15, 20]"
+                                layout="total, sizes, prev, pager, next, jumper"
+                                :current-page="form.pagenation.pageNum"
+                                :page-pageSize="form.pagenation.pageSize"
+                                :total="total"
+                                @current-change="handlePageChange"
+                                @size-change="handleSizeChange"
+                            ></el-pagination>
+                        </div>
+                    </div>
+                </el-form>
+            </el-card>
+        </el-row>
+        <div style="display:flex;margin-left:10px;margin-right:10px;margin-bottom:10px">
+            <div style="width:70%;">
+                <el-collapse v-model="activeNames" @change="handleChange">
+                    <el-collapse-item title="已选数据" name="1">
+                        <span style="margin-left:20px" v-for="item in multipleSelection" :key="item.id">
+                            <el-tag>ip:{{ item.ip }},位置{{ item.position }}</el-tag>
+                        </span>
+                    </el-collapse-item>
+                </el-collapse>
+            </div>
+            <div style="width:30%;margin-left:10px">
                 <el-card>
                     <div class="block">
                         <el-date-picker
-                            v-model="value1"
+                            @change="changeCreateTime"
+                            v-model="createTime"
                             type="datetimerange"
                             range-separator="至"
                             start-placeholder="开始日期"
@@ -14,8 +122,9 @@
                         </el-date-picker>
                     </div>
                 </el-card>
-            </el-col>
-        </el-row>
+            </div>
+        </div>
+
         <el-row :gutter="20" style="padding:10px;">
             <el-col :span="8">
                 <el-card shadow="hover" class="mgb8" style="height:380px;">
@@ -151,11 +260,42 @@ import {
     getTrendingTendency,
     getAlertsTypeStatistics
 } from '@/api/policeStatistics.js';
+import { getCamerasQuery, getCamerasCount, getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
+import { getAlertEventsState } from '@/api/alertEvents.js';
 export default {
     name: 'policeStatistics',
     data() {
         return {
-            value1: [new Date(2000, 10, 10, 0, 0), new Date(2000, 10, 11, 0, 0)],
+            form: {
+                ip: '', //摄像头ip地址
+                position: '', //摄像头位置
+                createTime: [], //报警事件创建时间
+                detectModelTypeArray: [], //摄像头检测模型
+                stateArray: [], //报警事件开启状态
+                pagenation: {
+                    pageNum: 1,
+                    pageSize: 10
+                },
+                sort: { field: 'createTime', type: 'asc' } //排序
+            },
+            total: 0, // 总条数
+            tableData: [],
+            multipleSelection: [], // 多选数据
+            detectModelTypeArray: [], //摄像头检测模型
+            stateArray: [], //状态  启动/关闭
+            showAll: true, //是否展开全部
+            activeNames: [],
+            createTime: [], // 时间  筛选
+            alertsTotalObj: {
+                createTime: {
+                    startTime: '',
+                    endTime: ''
+                },
+                cameras: []
+            }, // 获取报警统计参数
+
+            // -----------------------------
+
             echartData: {
                 distribution: {}, //报警分布
                 indicatorVariation: {}, //指令量变化趋势
@@ -175,13 +315,7 @@ export default {
                 dataTitle: []
             }, //报警量分类统计
             alertsTotalNum: '', //报警统计total
-            alertsTotalObj: {
-                createTime: {
-                    startTime: '2020/09/11 21:30:00',
-                    endTime: '2020/09/11 22:30:00'
-                },
-                cameras: [1, 2, 3]
-            }, // 获取报警统计参数
+
             alertsTotalObjByTop: {
                 top: 7,
                 createTime: {
@@ -197,11 +331,46 @@ export default {
         };
     },
     components: { Echart },
-    mounted() {},
-    computed: {},
+    mounted() {
+        this.$nextTick(function() {
+            this.closeSearch();
+        });
+    },
+    watch: {
+        multipleSelection(newVal, oldVal) {}
+    },
+    computed: {
+        word: function() {
+            if (this.showAll == false) {
+                //对文字进行处理
+                return '展开搜索';
+            } else {
+                return '收起搜索';
+            }
+        }
+    },
     created() {
+        //摄像头分页查询接口
+        let searchObj = JSON.parse(JSON.stringify(this.form));
+        searchObj.createTime = {};
+        this.getCamerasQuery(searchObj);
+        //检测模型类别查询接口
+        this.getDetectModelsTypes();
+        //获取所有状态信息，用于分类筛选
+        this.getAlertEventsState();
+        //摄像头分页查询接口 总量
+        let searchCountObj = JSON.parse(JSON.stringify(this.form));
+        searchCountObj.createTime = {};
+        let obj = JSON.parse(JSON.stringify(searchCountObj));
+        delete obj.sort;
+        delete obj.pagenation;
+        this.getCamerasCount(obj);
+
+        // -------------------------------------------
+
         //报警总计
-        this.getAlertsTotal(this.alertsTotalObj);
+        // this.getAlertsTotal(this.alertsTotalObj);
+
         //报警分布
         this.getAlertsDistribution(this.alertsTotalObj);
         //报警量变化趋势（带top 指示灯）
@@ -219,11 +388,188 @@ export default {
         this.getAlertsTypeStatistics(this.alertsTotalObj);
     },
     methods: {
-        //报警总计
-        async getAlertsTotal(obj) {
-            let { data: res } = await getAlertsTotal(obj);
-            this.alertsTotalNum = res.count;
+        // 根据条件分页展示报警事件信息    --0227
+        async getCamerasQuery(obj) {
+            let res = await getCamerasQuery(obj);
+            if (res.code == 0) {
+                this.tableData = res.detail;
+            } else {
+                //code 1 摄像头信息查询失败  code 2  系统错误
+                this.$message.error(res.content);
+            }
         },
+        //摄像头总量查询 --0227
+        async getCamerasCount(obj) {
+            let res = await getCamerasCount(obj);
+            if (res.code == 0) {
+                this.total = res.detail.count || 0;
+            } else {
+                // code 1  摄像头总数查询失败     code 2 系统错误
+                this.$message.error(res.content);
+            }
+        },
+        // 触发搜索按钮 --0227
+        handleSearch() {
+            this.$set(this.form.pagenation, 'pageNum', 1);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
+        },
+        // 多选操作
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        //摄像头检测模型  --0027
+        async getDetectModelsTypes() {
+            let res = await getDetectModelsTypes();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.detectModelTypeArray.push({
+                        value: item.id,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                //模型类型查询失败
+                this.$message.error(res.content);
+            } else if (res.code == 2) {
+                //系统错误
+                this.$message.error(res.content);
+            }
+        },
+        //获取所有状态信息，用于分类筛选 --0227
+        async getAlertEventsState() {
+            let res = await getAlertEventsState();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.stateArray.push({
+                        value: item.code,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                this.$message.error('查询失败');
+            }
+        },
+        // 分页
+        handlePageChange(val) {
+            this.$set(this.form.pagenation, 'pageNum', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
+        },
+        handleSizeChange(val) {
+            this.$set(this.form.pagenation, 'pageSize', val);
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            let tempObj = {};
+            tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+            tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+            searchObj.createTime = tempObj;
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            this.getCamerasCount(searchCountObj);
+        },
+        //排序 --0227
+        sortChange(column) {
+            if (column.order !== null) {
+                this.form.sort.field = column.prop;
+                if (column.order === 'descending') {
+                    this.form.sort.type = 'desc';
+                } else if (column.order === 'ascending') {
+                    this.form.sort.type = 'asc';
+                }
+                let searchObj = {};
+                if (JSON.stringify(this.form.createTime) == '[]') {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    searchObj.createTime = {};
+                } else {
+                    searchObj = JSON.parse(JSON.stringify(this.form));
+                    let tempObj = {};
+                    tempObj.startTime = this.$util.timestampToDateTime(searchObj.createTime[0]);
+                    tempObj.endTime = this.$util.timestampToDateTime(searchObj.createTime[1]);
+                    searchObj.createTime = tempObj;
+                }
+                this.getCamerasQuery(searchObj);
+            }
+        },
+        //表格时间转换 --0227
+        dateFormat(row, column) {
+            const date = this.$util.standardToDateTime(row.createTime);
+            return date;
+        },
+        //重置表单 --0227
+        resetForm(formName) {
+            this.$refs[formName].resetFields();
+            let searchObj = JSON.parse(JSON.stringify(this.form));
+            searchObj.createTime = {};
+            this.getCamerasQuery(searchObj);
+
+            let searchCountObj = JSON.parse(JSON.stringify(this.form));
+            delete searchCountObj.sort;
+            delete searchCountObj.pagenation;
+            let tempCountObj = {};
+            tempCountObj.startTime = this.$util.timestampToDateTime(searchCountObj.createTime[0]);
+            tempCountObj.endTime = this.$util.timestampToDateTime(searchCountObj.createTime[1]);
+            searchCountObj.createTime = tempCountObj;
+            this.getCamerasCount(searchCountObj);
+        },
+        //收展，展开
+        closeSearch() {
+            this.showAll = !this.showAll;
+            var searchBoxHeght = document.getElementById('searchBox');
+            if (this.showAll == false) {
+                searchBoxHeght.style.height = 50 + 'px';
+            } else {
+                searchBoxHeght.style.height = 'auto';
+            }
+        },
+        handleChange(val) {
+            console.log(val);
+        },
+        // 时间改变 触发 报警总计
+        async changeCreateTime(val) {
+            this.alertsTotalObj.createTime.startTime = this.$util.timestampToDateTime(val[0]);
+            this.alertsTotalObj.createTime.endTime = this.$util.timestampToDateTime(val[1]);
+            this.multipleSelection.forEach(item => {
+                this.alertsTotalObj.cameras.push(item.id);
+            });
+            let res = await getAlertsTotal(this.alertsTotalObj);
+            this.alertsTotalNum = res.totalCounts;
+        },
+
+        // -----------------------------------------
+
         //报警分布
         async getAlertsDistribution(obj) {
             let { data: res } = await getAlertsDistribution(obj);
@@ -592,5 +938,12 @@ export default {
 .todo-item-del {
     text-decoration: line-through;
     color: #999;
+}
+#searchBox {
+    overflow: hidden;
+}
+.el-collapse-item /deep/ .el-collapse-item__header {
+    height: 72px !important;
+    padding-left: 20px !important;
 }
 </style>
