@@ -10,9 +10,9 @@
                         <el-form-item label="手机号" prop="mobilephone">
                             <el-input style="width:100%" v-model="form.mobilephone" placeholder="请输入手机号"></el-input>
                         </el-form-item>
-                        <el-form-item label="权限筛选" prop="power">
-                            <el-select style="width:100%" v-model="form.power" placeholder="筛选条件">
-                                <el-option v-for="item in powerArr" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                        <el-form-item label="权限筛选" prop="roleid">
+                            <el-select style="width:100%" v-model="form.roleid" placeholder="筛选条件">
+                                <el-option v-for="item in powerArr" :key="item.id" :label="item.rolename" :value="item.id"> </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="创建时间" prop="createTime">
@@ -74,6 +74,7 @@
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
+                        <el-button type="text" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -93,14 +94,14 @@
         </div>
 
         <!-- 添加弹出框 -->
-        <el-dialog title="添加用户" :visible.sync="addUserFlag" width="35%" :before-close="handleCloseDialog">
-            <add-user @closeAddUserDialog="closeAddUserDialog" ref="addUser"></add-user>
+        <el-dialog :title="title" :visible.sync="addUserFlag" width="35%" :before-close="handleCloseDialog">
+            <add-user @closeAddUserDialog="closeAddUserDialog" :editUserObj="editUserObj" ref="addUser"></add-user>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { getUserAll, deleteUserById } from '@/api/user.js';
+import { getUserAll, deleteUserById, getUserRoles } from '@/api/user.js';
 import addUser from '@/views/page/userManagement/addUser.vue';
 export default {
     name: 'userManagement',
@@ -114,21 +115,14 @@ export default {
                     pageNum: 1,
                     pageSize: 10
                 },
-                sort: { field: 'create_time', type: 'asc' } //排序
-                // power: [], //权限
+                sort: { field: 'create_time', type: 'asc' }, //排序
+                roleid: '', //权限
             },
-            powerArr: [
-                {
-                    value: '0',
-                    label: '用户'
-                },
-                {
-                    value: '1',
-                    label: '管理员'
-                }
-            ], //权限数组
+            powerArr: [], //权限数组
             total: 0, // 总条数
             tableData: [], //表格数据
+            title: '',
+            editUserObj: {}, //编辑用户
             addUserFlag: false,
             multipleSelection: [],
             delList: []
@@ -142,6 +136,9 @@ export default {
         searchObj.createTime = {};
         //用户分页查询接口
         this.getUserAll(searchObj);
+
+        //获取权限列表
+        this.getUserRoles();
     },
     watch: {
         'form.createTime': {
@@ -162,6 +159,16 @@ export default {
         }
     },
     methods: {
+        //获取权限列表
+        async getUserRoles() {
+            let res = await getUserRoles();
+            if (res.code == 0) {
+                this.powerArr = res.detail;
+            } else {
+                // code 1
+                this.$error.message(res.content);
+            }
+        },
         // 根据条件分页展示用户信息   --0227
         async getUserAll(obj) {
             let res = await getUserAll(obj);
@@ -198,6 +205,7 @@ export default {
         //添加用户  --0227
         addUser() {
             this.addUserFlag = true;
+            this.title = '添加用户';
             if (this.$refs.addUser) {
                 this.$refs.addUser.$refs.ruleForm.clearValidate();
                 this.$refs.addUser.$refs.ruleForm.resetFields();
@@ -268,6 +276,12 @@ export default {
                         message: '已取消删除'
                     });
                 });
+        },
+        //编辑操作
+        handleEdit(index, row) {
+            this.editUserObj = row;
+            this.addUserFlag = true;
+            this.title = '编辑用户';
         },
 
         // 多选操作

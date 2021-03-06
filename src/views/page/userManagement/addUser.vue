@@ -31,7 +31,7 @@
 
 <script>
 import { isvalidPhone } from '@/utils/validate.js'; //表单校验
-import { addUser, getUserRoles } from '@/api/user.js'; //摄像头类型
+import { addUser, getUserRoles, updateUser } from '@/api/user.js'; //摄像头类型
 export default {
     data() {
         var validatePass = (rule, value, callback) => {
@@ -70,14 +70,41 @@ export default {
                 fullname: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
                 mobilephone: [{ required: true, validator: validPhone, trigger: 'blur' }],
                 user_role_id: [{ required: true, message: '权限不能为空', trigger: 'change' }]
-            }
+            },
+            editUserFlag: false //是否是编辑用户
         };
     },
     created() {
         //获取权限列表
         this.getUserRoles();
     },
-    mounted() {},
+    props: {
+        editUserObj: {
+            type: Object,
+            default() {
+                return {};
+            }
+        }
+    },
+    mounted() {
+        console.log(this.editUserObj);
+    },
+    watch: {
+        editUserObj: {
+            handler(newVal, oldVal) {
+                this.formData.username = newVal.username; //用户名
+                this.formData.password = newVal.password; //密码
+                this.formData.repassword = newVal.password; //确认密码
+                this.formData.fullname = newVal.fullname; //姓名
+                this.formData.mobilephone = newVal.mobilephone; //手机号
+                this.formData.user_role_id = newVal.user_role_id; //权限
+                this.formData.id = newVal.id; //用户id
+                this.editUserFlag = true;
+            },
+            immediate: true,
+            deep: true
+        }
+    },
     methods: {
         //获取权限列表
         async getUserRoles() {
@@ -91,20 +118,27 @@ export default {
         },
         submitForm(formName) {
             this.$refs[formName].validate(async valid => {
-                console.log(valid);
                 if (valid) {
                     let obj = JSON.parse(JSON.stringify(this.formData));
                     delete obj.repassword;
-                    let res = await addUser(obj);
-                    console.log(res);
+                    let res = {};
+                    if (this.editUserFlag) {
+                        res = await updateUser(obj);
+                    } else {
+                        res = await addUser(obj);
+                    }
                     if (res.code === '0') {
                         this.$message({
                             type: 'success',
-                            message: '添加成功!'
+                            message: this.editUserFlag ? '编辑成功' : '添加成功!'
                         });
                         this.$emit('closeAddUserDialog');
                     } else {
-                        this.$message.error('添加失败');
+                        if (this.editUserFlag) {
+                            this.$message.error('编辑失败');
+                        } else {
+                            this.$message.error('添加失败');
+                        }
                     }
                 } else {
                     console.log('error submit!!');

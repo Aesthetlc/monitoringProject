@@ -33,3 +33,12 @@ export function deleteUserById(id) {
         method: 'delete'
     });
 }
+
+//根据id编辑指定用户   --0227
+export function updateUser(data) {
+    return request({
+        url: `proxy/api/user/updateUser`,
+        method: 'post',
+        data
+    });
+}
