@@ -128,6 +128,8 @@ import {
     getAlertStatisticMonth,
     getAlertTrendingTop
 } from '@/api/index.js';
+import { mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 import Echart from '@/components/common/Echart';
 export default {
     name: 'dashboard',
@@ -170,7 +172,13 @@ export default {
                 top: 7,
                 days: 1
             }, //TOP7报警量排行
-            topWarnDataList: [] //top排行数据集合
+            topWarnDataList: [], //top排行数据集合
+            pages: {
+                total: 0,
+                limit: 1,
+                size: 10
+            },
+            tableData: []
             // arr: [
             //     {
             //         month: '1',
@@ -213,8 +221,6 @@ export default {
     },
     components: { Echart },
     mounted() {
-        
-
         //获取日数据
         this.getAlertStatisticDaily();
         //获取周数据
@@ -228,9 +234,37 @@ export default {
         this.getAlertTrendingBySeven(obj);
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
+
+        
+        //获取数据(模拟请求到了数据)
+        let stopTime = setInterval(() => {
+            let obj = {
+                id: 1,
+                ip: '172.23.138.20' + new Date().getTime(),
+                address: '东配楼3F3A1' + new Date().getTime(),
+                type: '指示灯',
+                warnTime: this.$util.timestampToDateTime(new Date().getTime()),
+                thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
+            };
+            if (this.monitoringArr.length >= 20) {
+                this.deleteMonitoringArr();
+                this.addMonitoringArr(obj);
+
+            } else {
+                this.addMonitoringArr(obj);
+                
+            }
+        }, 10000);
     },
-    computed: {},
+    computed: {
+        ...mapState(['monitoringArr'])
+    },
     methods: {
+        ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
+        
+
+
+
         // 获取日数据
         async getAlertStatisticDaily() {
             let res = await getAlertStatisticDaily();

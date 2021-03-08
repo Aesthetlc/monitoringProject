@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Message } from 'element-ui';
 axios.defaults.timeout = 90000;
 
+
 let loading = null; //定义loading变量
 let needLoadingRequestCount = 0; //声明一个变量
 

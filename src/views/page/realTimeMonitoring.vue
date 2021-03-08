@@ -31,7 +31,11 @@
                 @selection-change="handleSelectionChange"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column type="index" label="ID" width="55" align="center"></el-table-column>
+                <el-table-column label="序号" width="60" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.$index + (pages.limit - 1) * pages.size + 1 }} </span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="type" label="类型" align="center"></el-table-column>
@@ -107,7 +111,7 @@ export default {
                 limit: 1,
                 size: 10
             },
-            tableData: [],
+            tableData:[],
             multipleSelection: [],
             detectModelTypeArray: [], //摄像头检测模型
             delList: [],
@@ -118,37 +122,47 @@ export default {
         };
     },
     computed: {
-        ...mapState(['monitoringArr'])
+        ...mapState(['monitoringArr']),
+        
+    },
+    watch:{
+      'monitoringArr':{
+        handler(newVal,oldVal){
+          this.tableData =  newVal
+          this.pages.total = newVal.length
+        },
+        immediate:true,
+        deep:true
+      }
     },
     created() {
         //检测模型类别查询接口
         this.getDetectModelsTypes();
 
-        //获取数据
-        this.getTableListData();
-        //获取数据(模拟请求到了数据)
-        let stopTime = setInterval(() => {
-            let obj = {
-                id: 1,
-                ip: '172.23.138.20' + new Date().getTime(),
-                address: '东配楼3F3A1' + new Date().getTime(),
-                type: '指示灯',
-                warnTime: this.$util.timestampToDateTime(new Date().getTime()),
-                thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
-            };
-            if (this.monitoringArr.length >= 20) {
-                this.deleteMonitoringArr();
-                this.addMonitoringArr(obj);
-                // clearInterval(stopTime);
-            } else {
-                this.addMonitoringArr(obj);
-                //获取数据
-                this.getTableListData();
-            }
-        }, 10000);
+        // this.getTableListData();
+        // //获取数据(模拟请求到了数据)
+        // let stopTime = setInterval(() => {
+        //     let obj = {
+        //         id: 1,
+        //         ip: '172.23.138.20' + new Date().getTime(),
+        //         address: '东配楼3F3A1' + new Date().getTime(),
+        //         type: '指示灯',
+        //         warnTime: this.$util.timestampToDateTime(new Date().getTime()),
+        //         thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
+        //     };
+        //     if (this.monitoringArr.length >= 20) {
+        //         this.deleteMonitoringArr();
+        //         this.addMonitoringArr(obj);
+        //         // clearInterval(stopTime);
+        //     } else {
+        //         this.addMonitoringArr(obj);
+        //         //获取数据
+        //         this.getTableListData();
+        //     }
+        // }, 10000);
     },
     methods: {
-        ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
+        // ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
         //摄像头检测模型  --0027
         async getDetectModelsTypes() {
             let res = await getDetectModelsTypes();
@@ -169,10 +183,10 @@ export default {
         },
 
         //获取数据
-        getTableListData() {
-            this.tableData = this.monitoringArr;
-            this.pages.total = this.tableData.length || 0;
-        },
+        // getTableListData() {
+        //     this.tableData = this.monitoringArr;
+        //     this.pages.total = this.tableData.length || 0;
+        // },
         //重置表单
         resetForm() {
             this.$refs.form.resetFields();
