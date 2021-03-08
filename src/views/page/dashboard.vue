@@ -213,6 +213,8 @@ export default {
     },
     components: { Echart },
     mounted() {
+        
+
         //获取日数据
         this.getAlertStatisticDaily();
         //获取周数据
@@ -234,7 +236,7 @@ export default {
             let res = await getAlertStatisticDaily();
             if (res.code == 0) {
                 this.warnDayNum = res.detail.count;
-                this.warnDayPercentNum = res.detail.percent;
+                this.warnDayPercentNum = res.detail.percent.toFixed(2);
                 //日 柱状图
                 this.chartDayData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
                 this.chartDayData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);
@@ -248,7 +250,7 @@ export default {
             let res = await getAlertStatisticWeek();
             if (res.code == 0) {
                 this.warnWeekNum = res.detail.count;
-                this.warnWeekPercentNum = res.detail.percent;
+                this.warnWeekPercentNum = res.detail.percent.toFixed(2);
                 //周 柱状图
                 this.chartWeekData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
                 this.chartWeekData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);
@@ -262,7 +264,7 @@ export default {
             let res = await getAlertStatisticMonth();
             if (res.code == 0) {
                 this.warnMonthNum = res.detail.count;
-                this.warnMonthPercentNum = res.detail.percent;
+                this.warnMonthPercentNum = res.detail.percent.toFixed(2);
                 //月 柱状图
                 this.chartMonthData.data.push(res.detail.series[0].data[0], res.detail.series[1].data[0]);
                 this.chartMonthData.yTitle.push(res.detail.series[0].name, res.detail.series[1].name);

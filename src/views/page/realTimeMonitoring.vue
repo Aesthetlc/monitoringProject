@@ -121,9 +121,11 @@ export default {
         ...mapState(['monitoringArr'])
     },
     created() {
-        this.getTableListData();
         //检测模型类别查询接口
         this.getDetectModelsTypes();
+
+        //获取数据
+        this.getTableListData();
         //获取数据(模拟请求到了数据)
         let stopTime = setInterval(() => {
             let obj = {
@@ -143,24 +145,33 @@ export default {
                 //获取数据
                 this.getTableListData();
             }
-        }, 3000);
+        }, 10000);
     },
     methods: {
         ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
+        //摄像头检测模型  --0027
+        async getDetectModelsTypes() {
+            let res = await getDetectModelsTypes();
+            if (res.code == 0) {
+                res.detail.forEach(item => {
+                    this.detectModelTypeArray.push({
+                        value: item.name,
+                        label: item.name
+                    });
+                });
+            } else if (res.code == 1) {
+                //模型类型查询失败
+                this.$message.error(res.content);
+            } else if (res.code == 2) {
+                //系统错误
+                this.$message.error(res.content);
+            }
+        },
+
         //获取数据
         getTableListData() {
             this.tableData = this.monitoringArr;
             this.pages.total = this.tableData.length || 0;
-        },
-        //摄像头检测模型
-        async getDetectModelsTypes() {
-            let { data: res } = await getDetectModelsTypes();
-            res.forEach(item => {
-                this.detectModelTypeArray.push({
-                    value: item.name,
-                    label: item.name
-                });
-            });
         },
         //重置表单
         resetForm() {
