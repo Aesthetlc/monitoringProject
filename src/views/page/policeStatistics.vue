@@ -159,17 +159,24 @@
                     </div>
                     <!-- 指示灯报警量排⾏行行 -->
                     <div class="indicatorRank">
-                        <div v-for="(item, index) in indicatorLightDataList" class="alarmingTrendBySevenDayMes">
-                            <div style="display:flex">
-                                <div
-                                    class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
-                                >
-                                    {{ index + 1 }}
+                        <div v-if="indicatorLightDataList.length > 0">
+                            <div v-for="(item, index) in indicatorLightDataList" class="alarmingTrendBySevenDayMes">
+                                <div style="display:flex">
+                                    <div
+                                        class="alarmingTrendBySevenDayMesLeft"
+                                        :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
+                                    >
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div>{{ item.name }}</div>
                                 </div>
-                                <div>{{ item.name }}</div>
+                                <div style="margin-right:10px">{{ item.count }}</div>
                             </div>
-                            <div style="margin-right:10px">{{ item.count }}</div>
+                        </div>
+                        <div v-else>
+                            <div style="margin-top:10px">
+                                <span>暂无数据</span>
+                            </div>
                         </div>
                     </div>
                 </el-card>
@@ -194,17 +201,24 @@
                     </div>
                     <!-- 安全帽报警量排⾏ -->
                     <div class="indicatorRank">
-                        <div v-for="(item, index) in helmetDataList" class="alarmingTrendBySevenDayMes">
-                            <div style="display:flex">
-                                <div
-                                    class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
-                                >
-                                    {{ index + 1 }}
+                        <div v-if="helmetDataList.length > 0">
+                            <div v-for="(item, index) in helmetDataList" class="alarmingTrendBySevenDayMes">
+                                <div style="display:flex">
+                                    <div
+                                        class="alarmingTrendBySevenDayMesLeft"
+                                        :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
+                                    >
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div>{{ item.name }}</div>
                                 </div>
-                                <div>{{ item.name }}</div>
+                                <div style="margin-right:10px">{{ item.count }}</div>
                             </div>
-                            <div style="margin-right:10px">{{ item.count }}</div>
+                        </div>
+                        <div v-else>
+                            <div style="margin-top:10px">
+                                <span>暂无数据</span>
+                            </div>
                         </div>
                     </div>
                 </el-card>
@@ -229,17 +243,24 @@
                     </div>
                     <!-- 静电服报警量排⾏ -->
                     <div class="indicatorRank">
-                        <div v-for="(item, index) in antiStaticDataList" class="alarmingTrendBySevenDayMes">
-                            <div style="display:flex">
-                                <div
-                                    class="alarmingTrendBySevenDayMesLeft"
-                                    :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
-                                >
-                                    {{ index + 1 }}
+                        <div v-if="antiStaticDataList.length > 0">
+                            <div v-for="(item, index) in antiStaticDataList" class="alarmingTrendBySevenDayMes">
+                                <div style="display:flex">
+                                    <div
+                                        class="alarmingTrendBySevenDayMesLeft"
+                                        :class="{ redColor: index + 1 == 1, pinkColor: index + 1 == 2, yellowColor: index + 1 == 3 }"
+                                    >
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div>{{ item.name }}</div>
                                 </div>
-                                <div>{{ item.name }}</div>
+                                <div style="margin-right:10px">{{ item.count }}</div>
                             </div>
-                            <div style="margin-right:10px">{{ item.count }}</div>
+                        </div>
+                        <div v-else>
+                            <div style="margin-top:10px">
+                                <span>暂无数据</span>
+                            </div>
                         </div>
                     </div>
                 </el-card>
@@ -293,9 +314,7 @@ export default {
                 },
                 cameras: []
             }, // 获取报警统计参数
-
-            // -----------------------------
-
+            alertsTotalNum: '', //报警统计total
             echartData: {
                 distribution: {}, //报警分布
                 indicatorVariation: {}, //指令量变化趋势
@@ -314,7 +333,6 @@ export default {
                 data: [],
                 dataTitle: []
             }, //报警量分类统计
-            alertsTotalNum: '', //报警统计total
 
             alertsTotalObjByTop: {
                 top: 7,
@@ -370,22 +388,23 @@ export default {
 
         //报警总计
         // this.getAlertsTotal(this.alertsTotalObj);
-
         //报警分布
-        this.getAlertsDistribution(this.alertsTotalObj);
+        //this.getAlertsDistribution(this.alertsTotalObj);
+        //报警量变化趋势
+        // this.getTrendingTendency(this.alertsTotalObj);
+
         //报警量变化趋势（带top 指示灯）
-        this.alertsTotalObjByTop.type = '2';
-        this.getTopRankingLight(this.alertsTotalObjByTop);
+        // this.alertsTotalObjByTop.type = '2';
+        // this.getTopRankingLight(this.alertsTotalObjByTop);
         //报警量变化趋势（带top 安全帽）
-        this.alertsTotalObjByTop.type = '0';
-        this.getTopRankingHelmet(this.alertsTotalObjByTop);
+        // this.alertsTotalObjByTop.type = '0';
+        // this.getTopRankingHelmet(this.alertsTotalObjByTop);
         //报警量变化趋势（带top 静电服）
-        this.alertsTotalObjByTop.type = '1';
-        this.getTopRankingAntiStatic(this.alertsTotalObjByTop);
+        // this.alertsTotalObjByTop.type = '1';
+        // this.getTopRankingAntiStatic(this.alertsTotalObjByTop);
+
         //报警量变化趋势
-        this.getTrendingTendency(this.alertsTotalObj);
-        //报警量变化趋势
-        this.getAlertsTypeStatistics(this.alertsTotalObj);
+        // this.getAlertsTypeStatistics(this.alertsTotalObj);
     },
     methods: {
         // 根据条件分页展示报警事件信息    --0227
@@ -559,72 +578,138 @@ export default {
         },
         // 时间改变 触发 报警总计
         async changeCreateTime(val) {
+            this.echartData.distribution = {}; //报警分布
+            this.echartData.indicatorVariation = {}; //指令量变化趋势
+            this.echartData.alarmClassification = {}; //指令量分类统计
+            this.distributionData.dataTitle = []; //报警分布
+            this.distributionData.data = []; //报警分布
+            this.indicatorVariationData.dataTitle = []; //指令量变化趋势
+            this.indicatorVariationData.data = []; //指令量变化趋势
+            this.indicatorVariationData.x = []; //指令量变化趋势
+            this.alarmClassificationData.data = []; //报警量分类统计
+            this.alarmClassificationData.dataTitle = []; //报警量分类统计
+
             this.alertsTotalObj.createTime.startTime = this.$util.timestampToDateTime(val[0]);
             this.alertsTotalObj.createTime.endTime = this.$util.timestampToDateTime(val[1]);
             this.multipleSelection.forEach(item => {
                 this.alertsTotalObj.cameras.push(item.id);
             });
-            let res = await getAlertsTotal(this.alertsTotalObj);
-            this.alertsTotalNum = res.totalCounts;
+            // 报警量统计
+            this.getAlertsTotal(this.alertsTotalObj);
+            // 报警分布
+            this.getAlertsDistribution(this.alertsTotalObj);
+            // 指示灯报警量top   (组装参数)
+            let searchLightObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
+            searchLightObj.top = '7';
+            this.detectModelTypeArray.forEach(item => {
+                if (item.label == '指示灯') {
+                    searchLightObj.type = item.value;
+                }
+            });
+            //指示灯报警量top
+            this.getTopRankingLight(searchLightObj);
+            //报警量变化趋势 折线图
+            this.getTrendingTendency(this.alertsTotalObj);
+            //安全帽报警量top
+            let searchHelmetObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
+            searchHelmetObj.top = '7';
+            this.detectModelTypeArray.forEach(item => {
+                if (item.label == '安全帽') {
+                    searchHelmetObj.type = item.value;
+                }
+            });
+            this.getTopRankingHelmet(searchHelmetObj);
+
+            //报警量统计
+            this.getAlertsTypeStatistics(this.alertsTotalObj);
+            //静电服报警量top
+            let searchAntiStaticObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
+            searchAntiStaticObj.top = '7';
+            this.detectModelTypeArray.forEach(item => {
+                if (item.label == '静电服') {
+                    searchAntiStaticObj.type = item.value;
+                }
+            });
+            this.getTopRankingAntiStatic(searchAntiStaticObj);
         },
 
         // -----------------------------------------
 
-        //报警分布
+        // 报警量统计
+        async getAlertsTotal(obj) {
+            let totalRes = await getAlertsTotal(obj);
+            if (totalRes.code == '0') {
+                this.alertsTotalNum = totalRes.totalCounts;
+            } else {
+                //code 1
+                this.$meaasge.error('获取统计报警量失败');
+            }
+        },
+        // 报警分布
         async getAlertsDistribution(obj) {
-            let { data: res } = await getAlertsDistribution(obj);
-            this.distributionData.dataTitle = res.names;
-            this.distributionData.data = res.series;
-            this.echartData.distribution = this.drawDistribution(this.distributionData.dataTitle, this.distributionData.data);
+            let distributionRes = await getAlertsDistribution(obj);
+            if (distributionRes.code == '0') {
+                this.distributionData.dataTitle = distributionRes.detail.names;
+                this.distributionData.data = distributionRes.detail.series;
+                this.echartData.distribution = this.drawDistribution(this.distributionData.dataTitle, this.distributionData.data);
+            } else {
+                //code 1
+                this.$message.error('获取统计报警分布失败');
+            }
         },
         // 指示灯报警量top
         async getTopRankingLight(obj) {
-            let { data: res } = await getTopRankingLight(obj);
-            this.indicatorLightDataList = res;
+            let res = await getTopRankingLight(obj);
+            if (res.code == 0) {
+                this.indicatorLightDataList = res.detail;
+            } else {
+                //code 1
+                this.$message.error(res.content);
+            }
         },
         //安全帽报警量top
         async getTopRankingHelmet(obj) {
-            let { data: res } = await getTopRankingHelmet(obj);
-            this.helmetDataList = res;
+            let res = await getTopRankingHelmet(obj);
+            if (res.code == 0) {
+                this.helmetDataList = res.detail;
+            } else {
+                //code 1
+                this.$message.error(res.content);
+            }
         },
-        //静电服报警量top
-        async getTopRankingAntiStatic(obj) {
-            let { data: res } = await getTopRankingAntiStatic(obj);
-            this.antiStaticDataList = res;
-        },
-        // 报警量变化趋势 折线图
+        // 报警量变化趋势 折线图（有问题）
         async getTrendingTendency(obj) {
-            let { data: res } = await getTrendingTendency(obj);
+            let res = await getTrendingTendency(obj);
             let arr = [];
             let object = {};
-            res.forEach(item => {
-                this.indicatorVariationData.dataTitle.push(item.name);
-                if (item.data) {
-                    let result = item.data.map(ite => {
-                        return ite[1];
-                    });
-                    object.name = item.name;
-                    object.type = item.type;
-                    object.smooth = true;
-                    object.data = result;
-                    arr.push(JSON.parse(JSON.stringify(object)));
-                }
-            });
-            res[0].data.forEach(item => {
-                this.indicatorVariationData.x.push(item[0]);
-            });
-            this.indicatorVariationData.data = arr;
-            this.echartData.indicatorVariation = this.drawIndicatorVariation(
-                this.indicatorVariationData.x,
-                this.indicatorVariationData.data,
-                this.indicatorVariationData.dataTitle
-            );
+            console.log(res);
+            // res.forEach(item => {
+            //     this.indicatorVariationData.dataTitle.push(item.name);
+            //     if (item.data) {
+            //         let result = item.data.map(ite => {
+            //             return ite[1];
+            //         });
+            //         object.name = item.name;
+            //         object.type = item.type;
+            //         object.smooth = true;
+            //         object.data = result;
+            //         arr.push(JSON.parse(JSON.stringify(object)));
+            //     }
+            // });
+            // res[0].data.forEach(item => {
+            //     this.indicatorVariationData.x.push(item[0]);
+            // });
+            // this.indicatorVariationData.data = arr;
+            // this.echartData.indicatorVariation = this.drawIndicatorVariation(
+            //     this.indicatorVariationData.x,
+            //     this.indicatorVariationData.data,
+            //     this.indicatorVariationData.dataTitle
+            // );
         },
         // 报警量变化趋势 折线图
         async getAlertsTypeStatistics(obj) {
-            let { data: res } = await getAlertsTypeStatistics(obj);
-            console.log(res);
-            res.forEach(item => {
+            let res = await getAlertsTypeStatistics(obj);
+            res.detail.forEach(item => {
                 this.alarmClassificationData.dataTitle.push(item.name);
                 this.alarmClassificationData.data.push(item.data[0]);
             });
@@ -633,6 +718,17 @@ export default {
                 this.alarmClassificationData.data
             );
         },
+        //静电服报警量top
+        async getTopRankingAntiStatic(obj) {
+            let res = await getTopRankingAntiStatic(obj);
+            if (res.code == 0) {
+                this.antiStaticDataList = res.data;
+            } else {
+                //code 1
+                this.$message.error(res.content);
+            }
+        },
+
         //报警分布echarts
         drawDistribution(dataTitle, data) {
             var option = {
