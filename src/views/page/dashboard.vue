@@ -7,7 +7,7 @@
         </el-breadcrumb> -->
         <el-row :gutter="20" style="padding:10px;">
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb8" style="height:380px;">
+                <el-card shadow="hover" class="mgb8" style="height:230px;">
                     <!-- 报警量 -->
                     <div class="alarmVolumeTitle">
                         <div>报警量</div>
@@ -18,9 +18,14 @@
                         <div class="alarmVolumeMesLeft">
                             <div class="alarmVolumeMesLeftNum">{{ warnDayNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                日同比 {{ warnDayPercentNum }}%
-                                <em v-if="warnDayPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
-                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                <div>
+                                    <div>日同比</div>
+                                    <div>
+                                        {{ warnDayPercentNum }}%
+                                        <em v-if="warnDayPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                        <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartDay" class="alarmVolumeMesRight"></echart>
@@ -28,7 +33,7 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb8" style="height:380px;">
+                <el-card shadow="hover" class="mgb8" style="height:230px;">
                     <!-- 报警量 -->
                     <div class="alarmVolumeTitle">
                         <div>报警量</div>
@@ -39,9 +44,14 @@
                         <div class="alarmVolumeMesLeft">
                             <div class="alarmVolumeMesLeftNum">{{ warnWeekNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                周同比 {{ warnWeekPercentNum }}%
-                                <em v-if="warnWeekPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
-                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                <div>
+                                    <div>周同比</div>
+                                    <div>
+                                        {{ warnWeekPercentNum }}%
+                                        <em v-if="warnWeekPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                        <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartWeek" class="alarmVolumeMesRight"></echart>
@@ -49,7 +59,7 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb8" style="height:380px;">
+                <el-card shadow="hover" class="mgb8" style="height:230px;">
                     <!-- 报警量 -->
                     <div class="alarmVolumeTitle">
                         <div>报警量</div>
@@ -60,9 +70,14 @@
                         <div class="alarmVolumeMesLeft">
                             <div class="alarmVolumeMesLeftNum">{{ warnMonthNum }}</div>
                             <div class="alarmVolumeMesLeftProportion">
-                                月同比 {{ warnMonthPercentNum }}%
-                                <em v-if="warnMonthPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
-                                <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                <div>
+                                    <div>月同比</div>
+                                    <div>
+                                        {{ warnMonthPercentNum }}%
+                                        <em v-if="warnMonthPercentNum >= 0" style="color:red" class="el-icon-caret-top"></em>
+                                        <em v-else style="color:green" class="el-icon-caret-bottom"></em>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <echart :isAxisChart="true" :chartData="echartData.chartMonth" class="alarmVolumeMesRight"></echart>
@@ -70,7 +85,7 @@
                 </el-card>
             </el-col>
             <el-col :span="16">
-                <el-card shadow="hover" class="mgb8" style="height:380px;">
+                <el-card shadow="hover" class="mgb8" style="height:300px;">
                     <!-- 近7日报警趋势 -->
                     <div class="alarmVolumeTitle">
                         <div>近7日报警趋势</div>
@@ -82,14 +97,16 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb8" style="height:380px;">
+                <el-card shadow="hover" class="mgb8" style="height:300px;">
                     <!-- 近7日报警趋势 -->
                     <div class="alarmVolumeTitle">
                         <div>TOP7报警量排行</div>
-                        <el-radio-group v-model="radio" @change="changeTopDate">
-                            <el-radio label="1"><span style="font-size:18px">今日</span></el-radio>
-                            <el-radio label="7"><span style="font-size:18px">近7日</span></el-radio>
-                        </el-radio-group>
+                        <div>
+                            <el-radio-group v-model="radio" @change="changeTopDate">
+                                <el-radio label="1"><span style="font-size:18px">今日</span></el-radio>
+                                <el-radio label="7"><span style="font-size:18px">近7日</span></el-radio>
+                            </el-radio-group>
+                        </div>
                     </div>
                     <!-- 近7日报警趋势 -->
                     <div class="alarmingTrendBySevenDay">
@@ -235,7 +252,6 @@ export default {
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
 
-        
         //获取数据(模拟请求到了数据)
         let stopTime = setInterval(() => {
             let obj = {
@@ -249,10 +265,8 @@ export default {
             if (this.monitoringArr.length >= 20) {
                 this.deleteMonitoringArr();
                 this.addMonitoringArr(obj);
-
             } else {
                 this.addMonitoringArr(obj);
-                
             }
         }, 10000);
     },
@@ -261,9 +275,6 @@ export default {
     },
     methods: {
         ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
-        
-
-
 
         // 获取日数据
         async getAlertStatisticDaily() {
@@ -538,50 +549,63 @@ export default {
 <style scoped>
 .alarmVolumeTitle {
     display: flex;
-    height: 80px;
+    height: 40px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     /* border: 1px solid #000; */
     justify-content: space-between;
-    padding-left: 50px;
-    padding-right: 50px;
+    /* padding-left: 50px; */
+    /* padding-right: 50px; */
     align-items: center;
     font-size: 20px;
+    margin-top: -10px;
+    margin-bottom: 10px;
     font-weight: 500;
 }
 .alarmVolumeMes {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 250px;
+    height: 100%;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
     /* border: 1px solid #000; */
     border-top: 1px solid #999;
 }
 .alarmVolumeMesLeft {
-    width: 40%;
-    height: 100%;
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-content: center; */
+    width: 25%;
+    height: 130px;
+}
+.alarmVolumeMesRight {
+    width: 75%;
+    margin-top: 20px;
+    height: 130px;
 }
 .alarmVolumeMesLeftNum,
 .alarmVolumeMesLeftProportion {
     display: flex;
-    padding-left: 50px;
+    /* padding-left: 50px; */
     align-items: center;
     height: 50%;
+    /* display: flex; */
+    justify-content: center;
+    /* align-content: center; */
 }
 .alarmVolumeMesLeftNum {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
     font-size: 34px;
     font-weight: 700;
 }
 .alarmVolumeMesLeftProportion {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
 }
-.alarmVolumeMesRight {
-    width: 60%;
-    height: 100%;
-}
+
 .alarmingTrendBySevenDay {
     /* border: 1px solid #000; */
     border-top: 1px solid #999;
@@ -722,5 +746,8 @@ export default {
 .todo-item-del {
     text-decoration: line-through;
     color: #999;
+}
+::v-deep .el-radio {
+  margin-right: 10px!important;
 }
 </style>

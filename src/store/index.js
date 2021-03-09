@@ -22,13 +22,14 @@ const store = new Vuex.Store({
                 message: '这是一条成功的提示消息' + Math.random(),
                 type: 'success'
             });
+            console.log('这里报错了',state.monitoringArr);
             state.monitoringArr.unshift(params);
-            Cookies.set('monitoringArr', JSON.stringify(params));
+            Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },
         //删除最后一个预警信息
         deleteMonitoringArr(state, params) {
             state.monitoringArr.pop();
-            Cookies.set('monitoringArr', JSON.stringify(params));
+            Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },
         //从session取到值直接赋值给预警信息
         updateMonitoringArr(state, params) {

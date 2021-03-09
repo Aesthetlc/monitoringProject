@@ -2,21 +2,22 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
+                <!-- <el-form ref="form" class="demo-form-inline clearfix" inline :model="form"  label-width="90px"> -->
+                <el-form ref="form" class="demo-form-inline" inline :model="form"  label-width="90px">
                     <el-form-item label="摄像机ip" prop="ip">
-                        <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                        <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像机位置" prop="position">
-                        <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                        <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                        <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                        <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="开启状态" prop="stateArray">
-                        <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
+                        <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                         </el-select>
                     </el-form-item>
@@ -32,7 +33,7 @@
                             </el-date-picker>
                         </div>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item style="float:right">
                         <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
                         <el-button @click="resetForm('form')">重置</el-button>
                     </el-form-item>
@@ -472,4 +473,28 @@ export default {
     width: 40px;
     height: 40px;
 }
+
+/* ::v-deep .el-form-item label:after {
+        content: " ";
+        display: inline-block;
+        width: 100%;
+    }
+
+     ::v-deep .el-form-item__label {
+        text-align: justify
+    } */
+/* 这里去除必选字段的*,这个符号会造成一定影响,去掉之后我用了li列表进行定位,在前面加上" * ". */
+/* ::v-deep .el-form-item.is-required .el-form-item__label:before {
+        content: none !important;
+    } */
+    .clearfix:after{/*伪元素是行内元素 正常浏览器清除浮动方法*/
+        content: "";
+        display: block;
+        height: 0;
+        clear:both;
+        visibility: hidden;
+    }
+    .clearfix{
+        *zoom: 1;/*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
+    }
 </style>
