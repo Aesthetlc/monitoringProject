@@ -1,7 +1,6 @@
 import { Notification } from 'element-ui';
 import store from '@/store';
 
-
 //websocket对象
 let webSocket = null;
 

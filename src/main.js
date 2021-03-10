@@ -11,16 +11,20 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
-import animated from 'animate.css' 
+import animated from 'animate.css';
 
-import utilWebsocket from './utils/utilWebSocket'
-Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
-Vue.prototype.createWebSocket = utilWebsocket .createWebSocket;
+// import utilWebsocket from './utils/utilWebSocket'
+// Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
+// Vue.prototype.createWebSocket = utilWebsocket .createWebSocket;
+
+import utilSSE from './utils/utilSSE';
+Vue.prototype.closeSSE = utilSSE.closeSSE;
+Vue.prototype.createSSE = utilSSE.createSSE;
 
 Vue.config.productionTip = false;
 Vue.prototype.$echarts = echarts;
 
-Vue.use(animated); 
+Vue.use(animated);
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
     size: 'small'
