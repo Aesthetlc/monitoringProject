@@ -584,6 +584,7 @@ export default {
         },
         // 时间改变 触发 报警总计
         async changeCreateTime(val) {
+            this.alertsTotalObj.cameras = []
             this.echartData.distribution = {}; //报警分布
             this.echartData.indicatorVariation = {}; //指令量变化趋势
             this.echartData.alarmClassification = {}; //指令量分类统计
@@ -595,6 +596,8 @@ export default {
             this.alarmClassificationData.data = []; //报警量分类统计
             this.alarmClassificationData.dataTitle = []; //报警量分类统计
 
+
+            console.log(val);
             this.alertsTotalObj.createTime.startTime = this.$util.timestampToDateTime(val[0]);
             this.alertsTotalObj.createTime.endTime = this.$util.timestampToDateTime(val[1]);
             this.multipleSelection.forEach(item => {
@@ -608,7 +611,7 @@ export default {
             let searchLightObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
             searchLightObj.top = '7';
             this.detectModelTypeArray.forEach(item => {
-                if (item.label == '指示灯') {
+                if (item.label.indexOf('指示灯') > -1) {
                     searchLightObj.type = item.value;
                 }
             });
@@ -620,7 +623,7 @@ export default {
             let searchHelmetObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
             searchHelmetObj.top = '7';
             this.detectModelTypeArray.forEach(item => {
-                if (item.label == '安全帽') {
+                if (item.label.indexOf('安全帽') > -1) {
                     searchHelmetObj.type = item.value;
                 }
             });
@@ -632,7 +635,7 @@ export default {
             let searchAntiStaticObj = JSON.parse(JSON.stringify(this.alertsTotalObj));
             searchAntiStaticObj.top = '7';
             this.detectModelTypeArray.forEach(item => {
-                if (item.label == '静电服') {
+                if (item.label.indexOf('静电服') > -1) {
                     searchAntiStaticObj.type = item.value;
                 }
             });
