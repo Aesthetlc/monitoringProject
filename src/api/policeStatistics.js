@@ -27,7 +27,7 @@ export function getTopRankingLight(data) {
     });
 }
 
-//报警量变化趋势  --0227    （有问题）
+//报警量变化趋势  --0227 
 export function getTrendingTendency(data) {
     return request({
         url: `proxy/api/statistic/alerts/trending`,
@@ -57,8 +57,8 @@ export function getAlertsTypeStatistics(data) {
 //报警量top 静电服  --0227
 export function getTopRankingAntiStatic(data) {
     return request({
-        url: './topRankingAntiStatic.json',
-        method: 'get', //这个位置是post  等真实的请求来了记得更改
+        url: `proxy/api/statistic/alerts/top-ranking`,
+        method: 'post',
         data
     });
 }

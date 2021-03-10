@@ -2,8 +2,7 @@
     <div>
         <div class="container">
             <div>
-                <!-- <el-form ref="form" class="demo-form-inline clearfix" inline :model="form"  label-width="90px"> -->
-                <el-form ref="form" class="demo-form-inline" inline :model="form"  label-width="90px">
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
                     <el-form-item label="摄像机ip" prop="ip">
                         <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
@@ -487,14 +486,15 @@ export default {
 /* ::v-deep .el-form-item.is-required .el-form-item__label:before {
         content: none !important;
     } */
-    .clearfix:after{/*伪元素是行内元素 正常浏览器清除浮动方法*/
-        content: "";
-        display: block;
-        height: 0;
-        clear:both;
-        visibility: hidden;
-    }
-    .clearfix{
-        *zoom: 1;/*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
-    }
+.clearfix:after {
+    /*伪元素是行内元素 正常浏览器清除浮动方法*/
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {
+    *zoom: 1; /*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
+}
 </style>

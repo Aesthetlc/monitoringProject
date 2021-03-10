@@ -15,7 +15,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item style="float:right">
                         <el-button type="primary" @click="handleSearch('ruleForm')">搜索</el-button>
                         <el-button @click="resetForm('ruleForm')">重置</el-button>
                     </el-form-item>

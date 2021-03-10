@@ -9,6 +9,11 @@ module.exports = {
                 pathRewrite:{
                     '/proxy':''
                 }
+            },
+            '/customer/websocket/':{
+                target:'ws://8.141.53.8:8081',
+                ws:true,
+                secure:false,
             }
         }
     }

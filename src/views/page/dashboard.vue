@@ -268,14 +268,13 @@ export default {
             } else {
                 this.addMonitoringArr(obj);
             }
-        }, 10000);
+        }, 60000);
     },
     computed: {
         ...mapState(['monitoringArr'])
     },
     methods: {
         ...mapMutations(['addMonitoringArr', 'deleteMonitoringArr']),
-
         // 获取日数据
         async getAlertStatisticDaily() {
             let res = await getAlertStatisticDaily();
@@ -748,6 +747,6 @@ export default {
     color: #999;
 }
 ::v-deep .el-radio {
-  margin-right: 10px!important;
+    margin-right: 10px !important;
 }
 </style>

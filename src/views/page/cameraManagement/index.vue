@@ -2,22 +2,22 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
-                    <div id="searchBox">
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
+                    
                         <el-form-item label="摄像机ip" prop="ip">
-                            <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                            <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                         </el-form-item>
                         <el-form-item label="摄像机位置" prop="position">
-                            <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                            <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                         </el-form-item>
                         <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                            <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                            <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                                 <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="开启状态" prop="stateArray">
-                            <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
+                            <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
                                 <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
                             </el-select>
@@ -25,6 +25,7 @@
                         <el-form-item label="报警时间" prop="createTime">
                             <div class="block">
                                 <el-date-picker
+                                    style="width:100%"
                                     v-model="form.createTime"
                                     type="datetimerange"
                                     range-separator="至"
@@ -34,11 +35,11 @@
                                 </el-date-picker>
                             </div>
                         </el-form-item>
-                        <el-form-item>
+                        <el-form-item style="float:right">
                             <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
                             <el-button @click="resetForm('form')">重置</el-button>
                         </el-form-item>
-                    </div>
+                  
                 </el-form>
             </div>
             <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addCamera">添加</el-button>
@@ -468,7 +469,4 @@ export default {
     height: 40px;
 }
 
-#searchBox {
-    overflow: hidden;
-}
 </style>

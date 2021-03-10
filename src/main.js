@@ -13,6 +13,9 @@ import './components/common/directives';
 import 'babel-polyfill';
 import animated from 'animate.css' 
 
+import utilWebsocket from './utils/utilWebSocket'
+Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
+Vue.prototype.createWebSocket = utilWebsocket .createWebSocket;
 
 Vue.config.productionTip = false;
 Vue.prototype.$echarts = echarts;

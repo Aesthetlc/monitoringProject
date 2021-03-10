@@ -2,28 +2,30 @@
     <div>
         <el-row :gutter="20" style="padding:0px;margin-left:10px;margin-right:10px;margin-bottom:10px">
             <el-card>
-                <div style="text-align:right;margin-top:-20px">
-                    <el-button type="text" style="margin-left:10px" id="closeSearchBtn" @click="closeSearch">
-                        {{ word }}
-                        <i :class="showAll ? 'el-icon-arrow-up ' : 'el-icon-arrow-down'"></i>
-                    </el-button>
-                </div>
-                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="150px">
+                <!-- <div class="zi"> -->
+
+                <el-form ref="form" class="demo-form-inline clearfix fu" inline :model="form" label-width="85px">
                     <div id="searchBox">
+                        <div style="float:right">
+                            <el-button type="text" style="margin-left:10px" id="closeSearchBtn" @click="closeSearch">
+                                {{ word }}
+                                <i :class="showAll ? 'el-icon-arrow-up ' : 'el-icon-arrow-down'"></i>
+                            </el-button>
+                        </div>
                         <el-form-item label="摄像机ip" prop="ip">
-                            <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                            <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                         </el-form-item>
                         <el-form-item label="摄像机位置" prop="position">
-                            <el-input style="width:100%" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                            <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                         </el-form-item>
                         <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                            <el-select style="width:100%" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                            <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                                 <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="开启状态" prop="stateArray">
-                            <el-select style="width:100%" v-model="form.stateArray" multiple placeholder="筛选状态">
+                            <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
                                 <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
                             </el-select>
@@ -40,10 +42,11 @@
                                 </el-date-picker>
                             </div>
                         </el-form-item>
-                        <el-form-item>
+                        <el-form-item style="float:right">
                             <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
                             <el-button @click="resetForm('form')">重置</el-button>
                         </el-form-item>
+
                         <el-table
                             :data="tableData"
                             border
@@ -82,6 +85,7 @@
                                 :formatter="dateFormat"
                             ></el-table-column>
                         </el-table>
+                        <div style="clear:both"></div>
                         <div class="pagination">
                             <el-pagination
                                 background
@@ -98,8 +102,8 @@
                 </el-form>
             </el-card>
         </el-row>
-        <div style="display:flex;margin-left:10px;margin-right:10px;margin-bottom:10px">
-            <div style="width:70%;">
+        <el-row :gutter="20" style="padding:0px 10px;">
+            <el-col :span="16">
                 <el-collapse v-model="activeNames" @change="handleChange">
                     <el-collapse-item title="已选数据" name="1">
                         <span style="margin-left:20px" v-for="item in multipleSelection" :key="item.id">
@@ -107,11 +111,13 @@
                         </span>
                     </el-collapse-item>
                 </el-collapse>
-            </div>
-            <div style="width:30%;margin-left:10px">
+            </el-col>
+
+            <el-col :span="8">
                 <el-card>
                     <div class="block">
                         <el-date-picker
+                            style="width:100%"
                             @change="changeCreateTime"
                             v-model="createTime"
                             type="datetimerange"
@@ -122,8 +128,8 @@
                         </el-date-picker>
                     </div>
                 </el-card>
-            </div>
-        </div>
+            </el-col>
+        </el-row>
 
         <el-row :gutter="20" style="padding:10px;">
             <el-col :span="8">
@@ -677,34 +683,33 @@ export default {
                 this.$message.error(res.content);
             }
         },
-        // 报警量变化趋势 折线图（有问题）
+        // 报警量变化趋势 折线图
         async getTrendingTendency(obj) {
-            let res = await getTrendingTendency(obj);
+            let { detail: res } = await getTrendingTendency(obj);
             let arr = [];
             let object = {};
-            console.log(res);
-            // res.forEach(item => {
-            //     this.indicatorVariationData.dataTitle.push(item.name);
-            //     if (item.data) {
-            //         let result = item.data.map(ite => {
-            //             return ite[1];
-            //         });
-            //         object.name = item.name;
-            //         object.type = item.type;
-            //         object.smooth = true;
-            //         object.data = result;
-            //         arr.push(JSON.parse(JSON.stringify(object)));
-            //     }
-            // });
-            // res[0].data.forEach(item => {
-            //     this.indicatorVariationData.x.push(item[0]);
-            // });
-            // this.indicatorVariationData.data = arr;
-            // this.echartData.indicatorVariation = this.drawIndicatorVariation(
-            //     this.indicatorVariationData.x,
-            //     this.indicatorVariationData.data,
-            //     this.indicatorVariationData.dataTitle
-            // );
+            res.data.forEach(item => {
+                this.indicatorVariationData.dataTitle.push(item.name);
+                if (item.data) {
+                    let result = item.data.map(ite => {
+                        return ite[1];
+                    });
+                    object.name = item.name;
+                    object.type = item.type;
+                    object.smooth = true;
+                    object.data = result;
+                    arr.push(JSON.parse(JSON.stringify(object)));
+                }
+            });
+            res.data[0].data.forEach(item => {
+                this.indicatorVariationData.x.push(item[0]);
+            });
+            this.indicatorVariationData.data = arr;
+            this.echartData.indicatorVariation = this.drawIndicatorVariation(
+                this.indicatorVariationData.x,
+                this.indicatorVariationData.data,
+                this.indicatorVariationData.dataTitle
+            );
         },
         // 报警量变化趋势 折线图
         async getAlertsTypeStatistics(obj) {
@@ -722,7 +727,7 @@ export default {
         async getTopRankingAntiStatic(obj) {
             let res = await getTopRankingAntiStatic(obj);
             if (res.code == 0) {
-                this.antiStaticDataList = res.data;
+                this.antiStaticDataList = res.detail;
             } else {
                 //code 1
                 this.$message.error(res.content);
@@ -790,7 +795,11 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: dataTitle
+                    data: dataTitle,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 40
+                    }
                 },
                 yAxis: {
                     type: 'value'
@@ -932,9 +941,9 @@ export default {
     background-color: rgb(169, 169, 169);
 }
 
-.el-row {
+/* .el-row {
     margin-bottom: 20px;
-}
+} */
 
 .grid-content {
     display: flex;
@@ -1041,5 +1050,26 @@ export default {
 .el-collapse-item /deep/ .el-collapse-item__header {
     height: 72px !important;
     padding-left: 20px !important;
+}
+
+.clearfix:after {
+    /*伪元素是行内元素 正常浏览器清除浮动方法*/
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {
+    *zoom: 1; /*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
+}
+.fu {
+    position: relative;
+}
+.zi {
+    position: absolute;
+    top: 10;
+    right: 0;
+    width: 100px;
 }
 </style>

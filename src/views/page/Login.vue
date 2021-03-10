@@ -43,6 +43,8 @@ export default {
                 if (valid) {
                     this.$message.success('登录成功');
                     Cookies.set('token', this.param.username);
+                    // 创建长连接
+                    this.createWebSocket()
                     this.$router.push('/home');
                 } else {
                     this.$message.error('请输入账号和密码');

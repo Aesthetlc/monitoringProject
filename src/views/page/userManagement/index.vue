@@ -2,39 +2,36 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="120px">
-                    <div>
-                        <el-form-item label="用户名" prop="username">
-                            <el-input style="width:100%" v-model="form.username" placeholder="请输入用户名"></el-input>
-                        </el-form-item>
-                        <el-form-item label="手机号" prop="mobilephone">
-                            <el-input style="width:100%" v-model="form.mobilephone" placeholder="请输入手机号"></el-input>
-                        </el-form-item>
-                        <el-form-item label="权限筛选" prop="roleid">
-                            <el-select style="width:100%" v-model="form.roleid" placeholder="筛选条件">
-                                <el-option v-for="item in powerArr" :key="item.id" :label="item.rolename" :value="item.id"> </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="创建时间" prop="createTime">
-                            <div class="block">
-                                <el-date-picker
-                                    style="width:100%"
-                                    v-model="form.createTime"
-                                    type="datetimerange"
-                                    range-separator="至"
-                                    start-placeholder="开始日期"
-                                    end-placeholder="结束日期"
-                                >
-                                </el-date-picker>
-                            </div>
-                        </el-form-item>
-                    </div>
-                    <div style="text-align:right">
-                        <el-form-item>
-                            <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
-                            <el-button @click="resetForm('form')">重置</el-button>
-                        </el-form-item>
-                    </div>
+                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
+                    <el-form-item label="用户名" prop="username">
+                        <el-input style="width:150px" v-model="form.username" placeholder="请输入用户名"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" prop="mobilephone">
+                        <el-input style="width:150px" v-model="form.mobilephone" placeholder="请输入手机号"></el-input>
+                    </el-form-item>
+                    <el-form-item label="权限筛选" prop="roleid">
+                        <el-select style="width:150px" v-model="form.roleid" placeholder="筛选条件">
+                            <el-option v-for="item in powerArr" :key="item.id" :label="item.rolename" :value="item.id"> </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="创建时间" prop="createTime">
+                        <div class="block">
+                            <el-date-picker
+                                style="width:100%"
+                                v-model="form.createTime"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                            >
+                            </el-date-picker>
+                        </div>
+                    </el-form-item>
+
+                    <el-form-item style="float:right">
+                        <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                        <el-button @click="resetForm('form')">重置</el-button>
+                    </el-form-item>
                 </el-form>
             </div>
             <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addUser">添加</el-button>
@@ -116,7 +113,7 @@ export default {
                     pageSize: 10
                 },
                 sort: { field: 'create_time', type: 'asc' }, //排序
-                roleid: '', //权限
+                roleid: '' //权限
             },
             powerArr: [], //权限数组
             total: 0, // 总条数
