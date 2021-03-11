@@ -252,23 +252,23 @@ export default {
         //获取top7报警
         this.getAlertTrendingTop(this.topParams);
 
-        //获取数据(模拟请求到了数据)
-        let stopTime = setInterval(() => {
-            let obj = {
-                id: 1,
-                ip: '172.23.138.20' + new Date().getTime(),
-                address: '东配楼3F3A1' + new Date().getTime(),
-                type: '指示灯',
-                warnTime: this.$util.timestampToDateTime(new Date().getTime()),
-                thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
-            };
-            if (this.monitoringArr.length >= 20) {
-                this.deleteMonitoringArr();
-                this.addMonitoringArr(obj);
-            } else {
-                this.addMonitoringArr(obj);
-            }
-        }, 60000);
+        // //获取数据(模拟请求到了数据)
+        // let stopTime = setInterval(() => {
+        //     let obj = {
+        //         id: 1,
+        //         ip: '172.23.138.20' + new Date().getTime(),
+        //         address: '东配楼3F3A1' + new Date().getTime(),
+        //         type: '指示灯',
+        //         warnTime: this.$util.timestampToDateTime(new Date().getTime()),
+        //         thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
+        //     };
+        //     if (this.monitoringArr.length >= 20) {
+        //         this.deleteMonitoringArr();
+        //         this.addMonitoringArr(obj);
+        //     } else {
+        //         this.addMonitoringArr(obj);
+        //     }
+        // }, 60000);
     },
     computed: {
         ...mapState(['monitoringArr'])

@@ -18,11 +18,11 @@ const store = new Vuex.Store({
         //添加预警信息
         addMonitoringArr(state, params) {
             Notification({
-                title: '成功',
-                message: '这是一条成功的提示消息' + Math.random(),
+                title: params.camera,
+                message: params.describe,
                 type: 'success'
             });
-            console.log('这里报错了',state.monitoringArr);
+            // console.log('这里报错了',state.monitoringArr);
             state.monitoringArr.unshift(params);
             Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },

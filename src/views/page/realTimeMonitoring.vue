@@ -6,8 +6,8 @@
                     <el-form-item label="摄像机ip" prop="ip">
                         <el-input style="width:100%" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
-                    <el-form-item label="摄像机位置" prop="address">
-                        <el-input style="width:100%" v-model="form.address" placeholder="请输入摄像机位置"></el-input>
+                    <el-form-item label="摄像机位置" prop="location">
+                        <el-input style="width:100%" v-model="form.location" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
                     <el-form-item label="报警筛选" prop="type">
                         <el-select style="width:100%" v-model="form.type" placeholder="筛选条件">
@@ -37,7 +37,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column prop="address" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="location" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="type" label="类型" align="center"></el-table-column>
                 <el-table-column prop="warnTime" label="报警时间" align="center"></el-table-column>
 
@@ -75,7 +75,7 @@
                     <el-input v-model="showForm.ip"></el-input>
                 </el-form-item>
                 <el-form-item label="位置">
-                    <el-input v-model="showForm.address"></el-input>
+                    <el-input v-model="showForm.location"></el-input>
                 </el-form-item>
                 <el-form-item label="类型">
                     <el-input v-model="showForm.type"></el-input>
@@ -103,7 +103,7 @@ export default {
         return {
             form: {
                 ip: '',
-                address: '',
+                location: '',
                 type: ''
             },
             pages: {
@@ -145,7 +145,7 @@ export default {
         //     let obj = {
         //         id: 1,
         //         ip: '172.23.138.20' + new Date().getTime(),
-        //         address: '东配楼3F3A1' + new Date().getTime(),
+        //         location: '东配楼3F3A1' + new Date().getTime(),
         //         type: '指示灯',
         //         warnTime: this.$util.timestampToDateTime(new Date().getTime()),
         //         thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
@@ -198,7 +198,7 @@ export default {
             this.tableData = this.tableData.filter(item => {
                 return (
                     item.ip.search(this.form.ip) > -1 &&
-                    item.address.search(this.form.address) > -1 &&
+                    item.location.search(this.form.location) > -1 &&
                     item.type.search(this.form.type) > -1
                 );
             });

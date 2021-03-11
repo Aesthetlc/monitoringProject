@@ -1,5 +1,6 @@
 import { Notification } from 'element-ui';
 import store from '@/store';
+import Cookies from 'js-cookie'
 
 //source对象
 let source = null;
@@ -10,7 +11,7 @@ let createSSE = () => {
         const userId = '1';
         let path = window.location.href;
         console.log(path);
-        path = path.substring(0, path.indexOf("#"));
+        path = path.substring(0, path.indexOf('#'));
         console.log(path);
         source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
         // source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
@@ -60,9 +61,19 @@ let initSSE = () => {
      */
     source.addEventListener('message', function(e) {
         console.log('客户端收到服务器发来的数据');
+
         let mes = JSON.parse(e.data);
-        let mesObj = JSON.parse(window.atob(mes.body))
+        let mesObj = JSON.parse(window.atob(mes.body));
         console.log(mesObj);
+        if (store.state.monitoringArr.length >= 20) {
+            store.commit('deleteMonitoringArr');
+            store.commit('addMonitoringArr', mesObj);
+            // this.deleteMonitoringArr();
+            // this.addMonitoringArr(obj);
+        } else {
+            store.commit('addMonitoringArr', mesObj);
+            // this.addMonitoringArr(obj);
+        }
     });
 
     /**

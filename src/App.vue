@@ -6,15 +6,20 @@
 <script>
 import { mapMutations } from 'vuex';
 import { mapState } from 'vuex';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 export default {
     computed: {
         ...mapState(['monitoringArr'])
     },
     methods: {
-        ...mapMutations(['addMonitoringArr','updateMonitoringArr'])
+        ...mapMutations(['addMonitoringArr', 'updateMonitoringArr'])
     },
     created() {
+        console.log('app',Cookies.get('sseFlag') != undefined,Cookies.get('sseFlag'));
+        if (Cookies.get('sseFlag') != undefined) {
+            console.log(Cookies.get('sseFlag'), '---------------------');
+            this.createSSE();
+        }
         //在页面加载时读取sessionStorage里的状态信息
         // if (window.sessionStorage.getItem('monitoringArr')) {
         if (Cookies.get('monitoringArr')) {

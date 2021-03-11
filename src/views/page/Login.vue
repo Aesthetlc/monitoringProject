@@ -45,6 +45,7 @@ export default {
                     Cookies.set('token', this.param.username);
                     // 创建长连接
                     this.createSSE()
+                    Cookies.set('sseFlag',true)
                     this.$router.push('/home');
                 } else {
                     this.$message.error('请输入账号和密码');
