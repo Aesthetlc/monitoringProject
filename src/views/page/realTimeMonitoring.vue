@@ -49,7 +49,7 @@
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                        <!-- <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button> -->
                         <el-button type="text" @click="handleDelete(scope.$index, scope.row)">关闭</el-button>
                     </template>
                 </el-table-column>
