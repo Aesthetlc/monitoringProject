@@ -39,7 +39,7 @@
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="location" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="type" label="类型" align="center"></el-table-column>
-                <el-table-column prop="warnTime" label="报警时间" align="center"></el-table-column>
+                <el-table-column prop="timestamp" label="报警时间" align="center"></el-table-column>
 
                 <el-table-column label="缩略图" align="center">
                     <template slot-scope="scope">
@@ -81,7 +81,7 @@
                     <el-input v-model="showForm.type"></el-input>
                 </el-form-item>
                 <el-form-item label="时间">
-                    <el-input v-model="showForm.warnTime"></el-input>
+                    <el-input v-model="showForm.timestamp"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -147,7 +147,7 @@ export default {
         //         ip: '172.23.138.20' + new Date().getTime(),
         //         location: '东配楼3F3A1' + new Date().getTime(),
         //         type: '指示灯',
-        //         warnTime: this.$util.timestampToDateTime(new Date().getTime()),
+        //         timestamp: this.$util.timestampToDateTime(new Date().getTime()),
         //         thumb: 'https://lin-xin.gitee.io/images/post/wms.png'
         //     };
         //     if (this.monitoringArr.length >= 20) {

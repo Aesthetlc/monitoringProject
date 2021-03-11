@@ -1,6 +1,8 @@
 import { Notification } from 'element-ui';
 import store from '@/store';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+//连接标识 避免重复连接
+let isConnect = false;
 
 //source对象
 let source = null;
@@ -13,7 +15,7 @@ let createSSE = () => {
         console.log(path);
         path = path.substring(0, path.indexOf('#'));
         console.log(path);
-        source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
+        source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
         // source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
         console.log(source);
 
@@ -25,8 +27,7 @@ let createSSE = () => {
     }
 };
 
-//连接标识 避免重复连接
-let isConnect = false;
+
 //断线重连后，延迟5秒重新创建source连接  rec用来存储延迟请求的代码
 let rec;
 //定义重连函数
@@ -51,6 +52,7 @@ let initSSE = () => {
         'open',
         function(e) {
             console.log('建立连接');
+            isConnect = true;
         },
         false
     );
@@ -68,11 +70,8 @@ let initSSE = () => {
         if (store.state.monitoringArr.length >= 20) {
             store.commit('deleteMonitoringArr');
             store.commit('addMonitoringArr', mesObj);
-            // this.deleteMonitoringArr();
-            // this.addMonitoringArr(obj);
         } else {
             store.commit('addMonitoringArr', mesObj);
-            // this.addMonitoringArr(obj);
         }
     });
 
@@ -84,6 +83,8 @@ let initSSE = () => {
     source.addEventListener(
         'error',
         function(e) {
+            console.log('关闭连接了。。。');
+            isConnect = false;
             if (e.readyState === EventSource.CLOSED) {
                 console.log('连接错误');
             } else {
@@ -94,20 +95,43 @@ let initSSE = () => {
     );
 };
 
+//心跳设置
+// var heartCheck = {
+//     //每段时间发送一次心跳包 这里设置为20s
+//     timeout: 20000,
+//     //延时发送消息对象（启动心跳新建这个对象，收到消息后重置对象）
+//     timeoutObj: null,
+//     //一段时间后发送心跳包
+//     start: function() {
+//         this.timeoutObj = setTimeout(function() {
+//             if (isConnect) {
+//                 source.onopen = function(event) {
+//                     console.log('重新创建连接了。。。');
+//                 };
+//             }
+//         }, this.timeout);
+//     },
+//     //    接收到服务器的信息之后要重置心跳发送的方法
+//     reset: function() {
+//         clearTimeout(this.timeoutObj);
+//         this.start();
+//     }
+// };
+
 //获得消息之后   区别是心跳还是业务信息  如果是业务信息特殊处理（这里就用Element的notify才处理提醒）
-let getMsg = e => {
-    console.log('message');
-    console.log(e.data);
-    console.log(store.state.monitoringArr);
-    if (e.data != '连接成功' && e.data != checkMsg) {
-        Notification.error({
-            title: '失败',
-            message: e.data,
-            duration: 0,
-            type: 'error'
-        });
-    }
-};
+// let getMsg = e => {
+//     console.log('message');
+//     console.log(e.data);
+//     console.log(store.state.monitoringArr);
+//     if (e.data != '连接成功' && e.data != checkMsg) {
+//         Notification.error({
+//             title: '失败',
+//             message: e.data,
+//             duration: 0,
+//             type: 'error'
+//         });
+//     }
+// };
 
 //关闭连接
 let closeSSE = () => {
