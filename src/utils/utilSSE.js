@@ -6,17 +6,18 @@ let isConnect = false;
 
 //source对象
 let source = null;
+let userId = '1';
 
 //创建source连接
 let createSSE = () => {
     try {
-        const userId = '1';
+        
         let path = window.location.href;
         console.log(path);
         path = path.substring(0, path.indexOf('#'));
         console.log(path);
         source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
-        // source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
+        // source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
         console.log(source);
 
         initSSE();
@@ -137,7 +138,7 @@ let initSSE = () => {
 let closeSSE = () => {
     source.close();
     const httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', `http://8.141.53.8:8081/api/alert-events/close?id=${userId}`, true);
+    httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${userId}`, true);
     httpRequest.send();
     console.log('close');
 };
