@@ -145,8 +145,7 @@ import {
     getAlertStatisticMonth,
     getAlertTrendingTop
 } from '@/api/index.js';
-import { mapState } from 'vuex';
-import { mapMutations } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import Echart from '@/components/common/Echart';
 export default {
     name: 'dashboard',

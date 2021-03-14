@@ -31,6 +31,11 @@ const store = new Vuex.Store({
             state.monitoringArr.pop();
             Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },
+        //monitoringArr置空数组
+        emptyMonitoringArr(state, params) {
+            state.monitoringArr = [];
+            Cookies.remove('monitoringArr');
+        },
         //从session取到值直接赋值给预警信息
         updateMonitoringArr(state, params) {
             state.monitoringArr = params;

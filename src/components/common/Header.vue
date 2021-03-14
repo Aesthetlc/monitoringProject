@@ -10,7 +10,7 @@
             <div class="header-user-con">
                 <!-- 全屏显示 -->
                 <div class="btn-fullscreen" @click="handleFullScreen">
-                    <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
+                    <el-tooltip effect="dark" :content="fullscreen ? `取消全屏` : `全屏`" placement="bottom">
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
@@ -21,7 +21,7 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}}
+                        {{ username }}
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
@@ -33,7 +33,8 @@
     </div>
 </template>
 <script>
-import Cookies from 'js-cookie'
+import { mapState, mapMutations } from 'vuex';
+import Cookies from 'js-cookie';
 import bus from '@/components/common/bus';
 export default {
     data() {
@@ -52,13 +53,15 @@ export default {
         }
     },
     methods: {
+        ...mapMutations(['emptyMonitoringArr']),
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
                 // sessionStorage.removeItem('token');
                 Cookies.remove('token');
                 Cookies.remove('sseFlag');
-                this.closeSSE()
+                this.emptyMonitoringArr();
+                this.closeSSE();
                 this.$router.push('/login');
             }
         },
@@ -66,7 +69,7 @@ export default {
         collapseChage() {
             this.collapse = !this.collapse;
             bus.$emit('collapse', this.collapse);
-            bus.$emit('changeSize')
+            bus.$emit('changeSize');
         },
         // 全屏事件
         handleFullScreen() {
