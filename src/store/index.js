@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { Notification } from 'element-ui';
+// import audio from '@/utils/voicePrompt';
 import Cookies from 'js-cookie';
 
 Vue.use(Vuex);
@@ -22,6 +23,10 @@ const store = new Vuex.Store({
                 message: params.describe,
                 type: 'success'
             });
+            const audio = document.getElementById('audio');
+            // 从头播放
+            audio.currentTime = 0;
+            audio.play();
             // console.log('这里报错了',state.monitoringArr);
             state.monitoringArr.unshift(params);
             Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));

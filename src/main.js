@@ -12,12 +12,13 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import animated from 'animate.css';
+import utilSSE from './utils/utilSSE';
+
 
 // import utilWebsocket from './utils/utilWebSocket'
 // Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
 // Vue.prototype.createWebSocket = utilWebsocket .createWebSocket;
 
-import utilSSE from './utils/utilSSE';
 Vue.prototype.closeSSE = utilSSE.closeSSE;
 Vue.prototype.createSSE = utilSSE.createSSE;
 
