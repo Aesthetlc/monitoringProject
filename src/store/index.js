@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { Notification } from 'element-ui';
-// import audio from '@/utils/voicePrompt';
 import Cookies from 'js-cookie';
 
 Vue.use(Vuex);
