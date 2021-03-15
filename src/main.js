@@ -3,13 +3,11 @@ import App from './App.vue';
 import router from './permission';
 import ElementUI from 'element-ui';
 import echarts from 'echarts';
-import axios from './utils/request.js';
 import VueI18n from 'vue-i18n';
 import store from './store';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
-import './components/common/directives';
 import 'babel-polyfill';
 import animated from 'animate.css';
 import utilSSE from './utils/utilSSE';

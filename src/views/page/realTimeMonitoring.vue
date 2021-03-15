@@ -95,7 +95,6 @@
 <script>
 // import { fetchData } from '../../api/index';
 import { mapState } from 'vuex';
-import { mapMutations } from 'vuex';
 import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
 export default {
     name: 'realTimeMonitoring',

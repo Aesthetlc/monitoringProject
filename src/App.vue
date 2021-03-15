@@ -7,8 +7,7 @@
     </div>
 </template>
 <script>
-import { mapMutations } from 'vuex';
-import { mapState } from 'vuex';
+import { mapMutations,mapState } from 'vuex';
 import Cookies from 'js-cookie';
 export default {
     computed: {

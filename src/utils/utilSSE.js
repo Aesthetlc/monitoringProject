@@ -1,6 +1,4 @@
-import { Notification } from 'element-ui';
 import store from '@/store';
-import Cookies from 'js-cookie';
 //连接标识 避免重复连接
 let isConnect = false;
 
