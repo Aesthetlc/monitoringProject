@@ -12,7 +12,7 @@ const store = new Vuex.Store({
         isCollapse: false
     },
     mutations: {
-        changeCollapse(state, val) {
+        changeCollapse(state) {
             state.isCollapse = !state.isCollapse;
         },
         //添加预警信息
@@ -31,12 +31,12 @@ const store = new Vuex.Store({
             Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },
         //删除最后一个预警信息
-        deleteMonitoringArr(state, params) {
+        deleteMonitoringArr(state) {
             state.monitoringArr.pop();
             Cookies.set('monitoringArr', JSON.stringify(state.monitoringArr));
         },
         //monitoringArr置空数组
-        emptyMonitoringArr(state, params) {
+        emptyMonitoringArr(state) {
             state.monitoringArr = [];
             Cookies.remove('monitoringArr');
         },

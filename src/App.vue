@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <audio id="audio" preload="auto">
-            <source src="@/assets/audio/warn.wav" />
+            <source src="@/assets/audio/warn.mp3" />
         </audio>
         <router-view></router-view>
     </div>

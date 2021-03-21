@@ -28,7 +28,7 @@ export default new Router({
                 {
                     name: '报警管理',
                     path: 'alarmManagement',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/alarmManagement.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../views/page/alarmManagement'),
                     meta: { title: '报警管理' }
                 },
                 {

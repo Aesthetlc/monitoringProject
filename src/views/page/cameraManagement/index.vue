@@ -3,43 +3,41 @@
         <div class="container">
             <div>
                 <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
-                    
-                        <el-form-item label="摄像机ip" prop="ip">
-                            <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
-                        </el-form-item>
-                        <el-form-item label="摄像机位置" prop="position">
-                            <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
-                        </el-form-item>
-                        <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                            <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
-                                <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="开启状态" prop="stateArray">
-                            <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
-                                <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="报警时间" prop="createTime">
-                            <div class="block">
-                                <el-date-picker
-                                    style="width:100%"
-                                    v-model="form.createTime"
-                                    type="datetimerange"
-                                    range-separator="至"
-                                    start-placeholder="开始日期"
-                                    end-placeholder="结束日期"
-                                >
-                                </el-date-picker>
-                            </div>
-                        </el-form-item>
-                        <el-form-item style="float:right">
-                            <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
-                            <el-button @click="resetForm('form')">重置</el-button>
-                        </el-form-item>
-                  
+                    <el-form-item label="摄像机ip" prop="ip">
+                        <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                    </el-form-item>
+                    <el-form-item label="摄像机位置" prop="position">
+                        <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                    </el-form-item>
+                    <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                        <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                            <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="开启状态" prop="stateArray">
+                        <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
+                            <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="报警时间" prop="createTime">
+                        <div class="block">
+                            <el-date-picker
+                                style="width:100%"
+                                v-model="form.createTime"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                            >
+                            </el-date-picker>
+                        </div>
+                    </el-form-item>
+                    <el-form-item style="float:right">
+                        <el-button type="primary" @click="setImportanceLevel()">设置等级</el-button>
+                        <el-button type="primary" @click="handleSearch('form')">搜索</el-button>
+                        <el-button @click="resetForm('form')">重置</el-button>
+                    </el-form-item>
                 </el-form>
             </div>
             <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addCamera">添加</el-button>
@@ -55,18 +53,28 @@
                 :default-sort="{ prop: 'id', order: 'ascending' }"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
+
                 <el-table-column label="ID" width="60" align="center">
                     <template slot-scope="scope">
                         <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
                     </template>
                 </el-table-column>
+                <el-table-column label="重要度" width="100" align="center">
+                    <template slot-scope="scope">
+                        <!-- <el-color-picker disabled v-model="scope.row.color"></el-color-picker> -->
+                        <div class="stateStyle" style="backgroundColor:#ab32aa"></div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
-                <el-table-column prop="state" label="状态" align="center">
+                <el-table-column prop="state" label="状态" width="100" align="center">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.state">启动</span>
-                        <span v-else>停止</span>
+                        <div v-if="scope.row.state" class="stateStyle" style="backgroundColor:#00ff00"></div>
+                        <div v-else class="stateStyle" style="backgroundColor:#ff0000;"></div>
+
+                        <!-- <el-color-picker disabled v-if="scope.row.state" v-model="startColor"></el-color-picker> -->
+                        <!-- <el-color-picker disabled v-else v-model="endColor"></el-color-picker> -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -82,6 +90,7 @@
                         <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">停止</el-button>
                         <el-button v-if="!scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">启动</el-button>
+                        <el-button type="text" @click="showVideo(scope.$index, scope.row)">查看视频</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -103,6 +112,16 @@
         <el-dialog title="添加摄像头" :visible.sync="addCameraFlag" width="40%" :before-close="handleCloseDialog">
             <add-camera @closeAddCameraDialog="closeAddCameraDialog" ref="addCamera"></add-camera>
         </el-dialog>
+
+        <!-- 设置重要等级 -->
+        <el-dialog title="设置等级" :visible.sync="addImportanceLevelFlag" width="40%" :before-close="handleCloseLevelDialog">
+            <addImportanceLevel @closeAddLevelDialog="closeAddLevelDialog" ref="addImportanceLevel"></addImportanceLevel>
+        </el-dialog>
+
+        <!-- 查看视频 -->
+        <el-dialog title="查看视频" :visible.sync="showVideoFlag" width="40%" :before-close="handleVideoDialog">
+            <showVideo ref="showVideo"></showVideo>
+        </el-dialog>
     </div>
 </template>
 
@@ -110,6 +129,8 @@
 import { getAlertEventsState } from '@/api/alertEvents.js';
 import { getDetectModelsTypes, getCamerasQuery, getCamerasCount, deleteCamerasById, updateCamerasState } from '@/api/cameraManagement.js'; //摄像头类型
 import addCamera from '@/views/page/cameraManagement/addCamera.vue';
+import addImportanceLevel from '@/views/page/cameraManagement/addImportanceLevel.vue';
+import showVideo from '@/views/page/cameraManagement/showVideo.vue';
 export default {
     name: 'cameraManagement',
     data() {
@@ -133,13 +154,19 @@ export default {
             tableData: [],
             multipleSelection: [],
             delList: [],
-            showAll: true //是否展开全部
+            showAll: true, //是否展开全部
+            addImportanceLevelFlag: false, //设置等级弹窗开关
+            startColor: '#ff0000', // 开始颜色
+            endColor: '#00ff00', // 结束颜色
+            showVideoFlag: false // 视频查看弹窗开关
         };
     },
     computed: {},
     mounted() {},
     components: {
-        addCamera
+        addCamera,
+        addImportanceLevel,
+        showVideo
     },
     created() {
         //摄像头分页查询接口
@@ -161,7 +188,7 @@ export default {
     },
     watch: {
         'form.createTime': {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 let obj = {};
                 // obj.startTime = timeFormat(newVal[0]);
                 // obj.endTime = timeFormat(newVal[1]);
@@ -172,17 +199,34 @@ export default {
             }
         },
         'form.detectModelTypeArray': {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 console.log(newVal);
             }
         },
         'form.stateArray': {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 console.log(newVal);
             }
         }
     },
     methods: {
+        // 查看视频
+        showVideo() {
+            console.log('点击了视频查看');
+            this.showVideoFlag = true;
+        },
+        // 视频查看关闭
+        handleVideoDialog() {
+            this.showVideoFlag = false;
+        },
+        // 关闭设置等级弹窗
+        handleCloseLevelDialog() {
+            this.addImportanceLevelFlag = false;
+        },
+        // 设置重要等级
+        setImportanceLevel() {
+            this.addImportanceLevelFlag = true;
+        },
         // 根据条件分页展示报警事件信息    --0227
         async getCamerasQuery(obj) {
             let res = await getCamerasQuery(obj);
@@ -236,7 +280,7 @@ export default {
             }
         },
         //表格时间转换 --0227
-        dateFormat(row, column) {
+        dateFormat(row) {
             const date = this.$util.standardToDateTime(row.createTime);
             return date;
         },
@@ -309,6 +353,11 @@ export default {
         // 关闭添加的弹窗
         closeAddCameraDialog() {
             this.addCameraFlag = false;
+            this.resetForm('form');
+        },
+        // 关闭设置重要等级的弹窗
+        closeAddLevelDialog() {
+            this.addImportanceLevelFlag = false;
             this.resetForm('form');
         },
         // 关闭添加的弹窗
@@ -468,5 +517,10 @@ export default {
     width: 40px;
     height: 40px;
 }
-
+.stateStyle {
+    height: 20px;
+    width: 20px;
+    margin: 0 auto;
+    border-radius: 50%;
+}
 </style>

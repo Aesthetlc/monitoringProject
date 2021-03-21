@@ -49,7 +49,7 @@ let initSSE = () => {
      */
     source.addEventListener(
         'open',
-        function(e) {
+        function() {
             console.log('建立连接');
             isConnect = true;
         },

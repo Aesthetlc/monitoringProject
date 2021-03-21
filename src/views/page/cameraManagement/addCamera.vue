@@ -10,6 +10,11 @@
             <el-form-item label="摄像头位置" prop="position">
                 <el-input v-model="ruleForm.position"></el-input>
             </el-form-item>
+            <el-form-item label="重要度" prop="level">
+                <el-select style="width:100%" v-model="ruleForm.level" placeholder="请选择">
+                    <el-option v-for="item in levelOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item>
                 <el-button @click="closeDialog()">关闭</el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
@@ -31,7 +36,6 @@ export default {
             } else if (value) {
                 setTimeout(() => {
                     detectModelsCameraByIp(value).then(res => {
-                        console.log(res, '---------');
                         if (res.code == 0) {
                             this.detectModelId = res.detail.detectModelId;
                             this.ruleForm.modelType = res.detail.detectModelType;
@@ -49,7 +53,8 @@ export default {
             ruleForm: {
                 ip: '',
                 modelType: '',
-                position: ''
+                position: '',
+                level: ''
             },
             detectModelId: '', //模型Id
             rules: {
@@ -57,8 +62,16 @@ export default {
                     { required: true, message: '请输入摄像头ip', trigger: 'blur' },
                     { validator: checkIp, trigger: 'blur' }
                 ],
-                position: [{ required: true, message: '请输入摄像头位置', trigger: 'blur' }]
-            }
+                position: [{ required: true, message: '请输入摄像头位置', trigger: 'blur' }],
+                level: [{ required: true, message: '等级不能为空', trigger: 'blur' }],
+            },
+            levelOptions: [
+                { value: '1', label: '等级1' },
+                { value: '2', label: '等级2' },
+                { value: '3', label: '等级3' },
+                { value: '4', label: '等级4' },
+                { value: '5', label: '等级5' },
+            ]
         };
     },
     mounted() {

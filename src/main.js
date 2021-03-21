@@ -9,9 +9,9 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
 import 'babel-polyfill';
+import '@/utils/buttonPermission';
 import animated from 'animate.css';
 import utilSSE from './utils/utilSSE';
-
 
 // import utilWebsocket from './utils/utilWebSocket'
 // Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
@@ -19,9 +19,8 @@ import utilSSE from './utils/utilSSE';
 
 Vue.prototype.closeSSE = utilSSE.closeSSE;
 Vue.prototype.createSSE = utilSSE.createSSE;
-
-Vue.config.productionTip = false;
 Vue.prototype.$echarts = echarts;
+Vue.config.productionTip = false;
 
 Vue.use(animated);
 Vue.use(VueI18n);

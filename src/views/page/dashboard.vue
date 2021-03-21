@@ -137,7 +137,6 @@
 </template>
 
 <script>
-import bus from '@/components/common/bus';
 import {
     getAlertTrendingBySeven,
     getAlertStatisticDaily,
@@ -516,7 +515,6 @@ export default {
                     {
                         name: '报警数量',
                         type: 'bar',
-                        barWidth: '60%',
                         barWidth: 30,
                         label: {
                             show: true,

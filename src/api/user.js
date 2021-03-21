@@ -10,7 +10,7 @@ export function getUserAll(data) {
 }
 
 //用户角色列表  --0227
-export function getUserRoles(data) {
+export function getUserRoles() {
     return request({
         url: 'proxy/api/user/userRoles',
         method: 'get'

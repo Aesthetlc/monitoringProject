@@ -33,7 +33,7 @@
     </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapMutations } from 'vuex';
 import Cookies from 'js-cookie';
 import bus from '@/components/common/bus';
 export default {

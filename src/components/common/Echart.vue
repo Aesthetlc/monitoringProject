@@ -13,11 +13,11 @@ export default {
     props: {
         chartData: {
             type: Object,
-            default: {}
+            default: () => {}
         },
         isAxisChart: {
             type: Boolean,
-            default: {}
+            default: () => {}
         }
     },
     computed: {
@@ -68,7 +68,9 @@ export default {
             }
         },
         resizeChart() {
-            this.echart ? this.echart.resize() : '';
+            if (this.echart) {
+                this.echart.resize();
+            }
         },
         //收缩展开
         handleListenter() {
@@ -78,7 +80,7 @@ export default {
                 that.resizeChart();
             });
         },
-        handleBus(msg) {
+        handleBus() {
             let that = this;
             setTimeout(() => {
                 that.resizeChart();

@@ -91,7 +91,7 @@ export default {
     },
     watch: {
         editUserObj: {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 this.formData.username = newVal.username; //用户名
                 this.formData.password = newVal.password; //密码
                 this.formData.repassword = newVal.password; //确认密码

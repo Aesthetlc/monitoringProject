@@ -34,7 +34,9 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addUser">添加</el-button>
+            <el-button type="primary" icon="el-icon-plus" style="margin-bottom:10px" @click="addUser" v-has="{ role: ['admin'] }"
+                >添加</el-button
+            >
             <el-table
                 :data="tableData"
                 border
@@ -139,7 +141,7 @@ export default {
     },
     watch: {
         'form.createTime': {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 let obj = {};
                 // obj.startTime = timeFormat(newVal[0]);
                 // obj.endTime = timeFormat(newVal[1]);
@@ -150,7 +152,7 @@ export default {
             }
         },
         'form.powerArr': {
-            handler(newVal, oldVal) {
+            handler(newVal) {
                 console.log(newVal);
             }
         }
@@ -178,7 +180,7 @@ export default {
             }
         },
         //表格时间转换 --0227
-        dateFormat(row, column) {
+        dateFormat(row) {
             const date = this.$util.standardToDateTime(row.create_time);
             return date;
         },
