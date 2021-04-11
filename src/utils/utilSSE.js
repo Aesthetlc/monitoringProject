@@ -4,17 +4,14 @@ let isConnect = false;
 
 //source对象
 let source = null;
-let userId = '1';
+// let userId = store.state.userId;
 
 //创建source连接
-let createSSE = () => {
+let createSSE = (id) => {
     try {
-        
         let path = window.location.href;
-        console.log(path);
         path = path.substring(0, path.indexOf('#'));
-        console.log(path);
-        source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${userId}`);
+        source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${id}`);
         // source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
         console.log(source);
 
@@ -133,10 +130,10 @@ let initSSE = () => {
 // };
 
 //关闭连接
-let closeSSE = () => {
+let closeSSE = (id) => {
     source.close();
     const httpRequest = new XMLHttpRequest();
-    httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${userId}`, true);
+    httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${id}`, true);
     httpRequest.send();
     console.log('close');
 };

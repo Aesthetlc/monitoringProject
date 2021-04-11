@@ -59,3 +59,34 @@ export function updateCamerasState(data, id) {
         data
     });
 }
+
+//获取全部等级（重要度）  --0227
+export function getImportanceLevel() {
+    return request({
+        url: `proxy/api/importance`,
+        method: 'get'
+    });
+}
+
+//修改等级（重要度）  --0227
+export function updateImportanceLevel(data) {
+    return request({
+        url: `proxy/api/importance`,
+        method: 'put',
+        data
+    });
+}
+
+//编辑摄像头 --0227
+export function updateCameras(data) {
+    return request({
+        url: `proxy/api/cameras/${data.id}`,
+        method: 'put',
+        data: {
+            ip: data.ip,
+            position: data.position,
+            detectModelId: -1, //  这个字段算便写 编辑的时候  后台不会读取这个字段
+            importanceId: data.importanceId
+        }
+    });
+}

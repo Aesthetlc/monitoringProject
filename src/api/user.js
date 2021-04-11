@@ -42,3 +42,12 @@ export function updateUser(data) {
         data
     });
 }
+
+//登录   --0227
+export function login(data) {
+  return request({
+      url: `proxy/api/user/login`,
+      method: 'post',
+      data
+  });
+}

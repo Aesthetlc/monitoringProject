@@ -11,52 +11,52 @@ export default new Router({
         },
         {
             path: '/home',
-            component: () => import(/* webpackChunkName: "home" */ '../components/common/Home.vue'),
+            component: () => import('../components/common/Home.vue'),
             children: [
                 {
                     name: '首页',
                     path: '',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../views/page/dashboard.vue'),
-                    meta: { title: '首页' }
+                    component: () => import('../views/page/dashboard.vue'),
+                    meta: { title: '首页', role: ['admin', 'user'] }
                 },
                 {
                     name: '实时监控',
                     path: 'realTimeMonitoring',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/realTimeMonitoring.vue'),
-                    meta: { title: '实时监控' }
+                    component: () => import('../views/page/realTimeMonitoring.vue'),
+                    meta: { title: '实时监控', role: ['admin', 'user'] }
                 },
                 {
                     name: '报警管理',
                     path: 'alarmManagement',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/alarmManagement'),
-                    meta: { title: '报警管理' }
+                    component: () => import('../views/page/alarmManagement'),
+                    meta: { title: '报警管理', role: ['admin', 'user'] }
                 },
                 {
                     name: '报警统计',
                     path: 'policeStatistics',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/policeStatistics.vue'),
-                    meta: { title: '报警统计' }
+                    component: () => import('../views/page/policeStatistics.vue'),
+                    meta: { title: '报警统计', role: ['admin', 'user'] }
                 },
                 {
                     name: '摄像头管理',
                     path: 'cameraManagement',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/cameraManagement'),
-                    meta: { title: '摄像头管理' }
+                    component: () => import('../views/page/cameraManagement'),
+                    meta: { title: '摄像头管理', role: ['admin', 'user'] }
                 },
                 {
                     name: '用户管理',
                     path: 'userManagement',
-                    component: () => import(/* webpackChunkName: "table" */ '../views/page/userManagement'),
-                    meta: { title: '用户管理' }
+                    component: () => import('../views/page/userManagement'),
+                    meta: { title: '用户管理', role: ['admin'] }
                 },
                 {
                     path: '404',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/page/404.vue'),
+                    component: () => import('../views/page/404.vue'),
                     meta: { title: '404' }
                 },
                 {
                     path: '403',
-                    component: () => import(/* webpackChunkName: "403" */ '../views/page/403.vue'),
+                    component: () => import('../views/page/403.vue'),
                     meta: { title: '403' }
                 }
             ]
@@ -67,8 +67,14 @@ export default new Router({
             meta: { title: '登录' }
         },
         {
+            path: '/403',
+            component: () => import('../views/page/403.vue'),
+            meta: { title: '403' }
+        },
+        {
             path: '*',
-            redirect: '/404'
+            component: () => import('../views/page/404.vue'),
+            meta: { title: '404' }
         }
     ]
 });

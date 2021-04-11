@@ -85,7 +85,7 @@
                 </el-card>
             </el-col>
             <el-col :span="16">
-                <el-card shadow="hover" class="mgb8" style="height:300px;">
+                <el-card shadow="hover" class="mgb8" style="height:310px;">
                     <!-- 近7日报警趋势 -->
                     <div class="alarmVolumeTitle">
                         <div>近7日报警趋势</div>
@@ -97,7 +97,7 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb8" style="height:300px;">
+                <el-card shadow="hover" class="mgb8" style="height:310px;">
                     <!-- 近7日报警趋势 -->
                     <div class="alarmVolumeTitle">
                         <div>TOP7报警量排行</div>

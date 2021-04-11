@@ -7,18 +7,38 @@
     </div>
 </template>
 <script>
-import { mapMutations,mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 import Cookies from 'js-cookie';
 export default {
     computed: {
-        ...mapState(['monitoringArr'])
+        ...mapState(['monitoringArr', 'userId'])
     },
     methods: {
-        ...mapMutations(['addMonitoringArr', 'updateMonitoringArr'])
+        ...mapMutations(['addMonitoringArr', 'updateMonitoringArr', 'setUserId', 'setRefreshBlank', 'setMuteInterval', 'setUserRole'])
     },
     created() {
         if (Cookies.get('sseFlag') != undefined) {
             this.createSSE();
+        }
+        // 刷新userId重新给vuex赋值
+        if (Cookies.get('userId') != undefined) {
+            this.setUserId(Cookies.get('userId'));
+        }
+        // 刷新userRole重新给vuex赋值
+        if (Cookies.get('userRole') != undefined) {
+            this.setUserRole(Cookies.get('userRole'));
+        }
+        // 重新获取静音时间段
+        if (Cookies.get('muteStartTime') != undefined || Cookies.get('muteEndTime') != undefined) {
+            let obj = {
+                mute_start_time: Cookies.get('muteStartTime'),
+                mute_end_time: Cookies.get('muteEndTime')
+            };
+            this.setMuteInterval(obj);
+        }
+        // 重新获取刷新时间间隔
+        if (Cookies.get('refreshTime') != undefined) {
+            this.setRefreshBlank(Cookies.get('refreshTime'));
         }
         //在页面加载时读取sessionStorage里的状态信息
         // if (window.sessionStorage.getItem('monitoringArr')) {

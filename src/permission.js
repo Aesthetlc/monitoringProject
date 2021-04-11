@@ -1,5 +1,6 @@
 import router from './router/index.js';
 import Cookies from 'js-cookie';
+import store from '@/store';
 
 const whiteList = ['/login']; // no redirect whitelist
 // 全局前置守卫
@@ -13,6 +14,8 @@ router.beforeEach(function(to, from, next) {
             next({
                 path: '/'
             });
+        } else if (to.meta.role && !to.meta.role.includes(Cookies.get('userRole'))) {
+            next('/403');
         } else {
             next();
             document.title = `${to.meta.title} | 监控系统`;
@@ -22,7 +25,7 @@ router.beforeEach(function(to, from, next) {
             next();
             document.title = `${to.meta.title} | 监控系统`;
         } else {
-            next(`/login?redirect=${to.path}`);
+            next(`/login`);
         }
     }
 });

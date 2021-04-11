@@ -3,32 +3,21 @@ import App from './App.vue';
 import router from './permission';
 import ElementUI from 'element-ui';
 import echarts from 'echarts';
-import VueI18n from 'vue-i18n';
 import store from './store';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
+import './assets/icon/iconfont.css';
 import './assets/css/icon.css';
 import 'babel-polyfill';
 import '@/utils/buttonPermission';
-import animated from 'animate.css';
 import utilSSE from './utils/utilSSE';
-
-// import utilWebsocket from './utils/utilWebSocket'
-// Vue.prototype.closeWebSocket = utilWebsocket .closeWebSocket;
-// Vue.prototype.createWebSocket = utilWebsocket .createWebSocket;
-
 Vue.prototype.closeSSE = utilSSE.closeSSE;
 Vue.prototype.createSSE = utilSSE.createSSE;
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
 
-Vue.use(animated);
-Vue.use(VueI18n);
 Vue.use(ElementUI, {
     size: 'small'
-});
-const i18n = new VueI18n({
-    locale: 'zh'
 });
 
 // 导入util
@@ -58,7 +47,6 @@ Vue.prototype.$util = util; // 赋值给全局对象
 
 new Vue({
     router,
-    i18n,
     store,
     render: h => h(App)
 }).$mount('#app');

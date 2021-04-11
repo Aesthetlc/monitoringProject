@@ -58,10 +58,13 @@ export default {
         handleCommand(command) {
             if (command == 'loginout') {
                 // sessionStorage.removeItem('token');
-                Cookies.remove('token');
-                Cookies.remove('sseFlag');
+                Cookies.remove('token'); // 移除登录成功标识
+                Cookies.remove('sseFlag'); // 移除长连接请求标识
+                Cookies.remove('muteStartTime'); // 移除静音开始时间
+                Cookies.remove('muteEndTime'); // 移除静音结束时间
+                Cookies.remove('refreshTime'); // 移除请求时间间隔
                 this.emptyMonitoringArr();
-                this.closeSSE();
+                this.closeSSE(this.$store.state.userId);
                 this.$router.push('/login');
             }
         },

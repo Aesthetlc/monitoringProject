@@ -4,20 +4,26 @@
             <div>
                 <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
                     <el-form-item label="摄像机ip" prop="ip">
-                        <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
+                        <el-input style="width:200px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像机位置" prop="position">
-                        <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
+                        <el-input style="width:200px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
                     <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
-                        <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
+                        <el-select style="width:200px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                             <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="开启状态" prop="stateArray">
-                        <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
+                        <el-select style="width:200px" v-model="form.stateArray" multiple placeholder="筛选状态">
                             <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="重要度" prop="importanceArray">
+                        <el-select style="width:200px" v-model="form.importanceArray" multiple placeholder="筛选等级">
+                            <el-option v-for="item in importanceLevel" :key="item.id" :label="`等级${item.level}`" :value="item.id">
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="报警时间" prop="createTime">
@@ -59,19 +65,28 @@
                         <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
                     </template>
                 </el-table-column>
-                <el-table-column label="重要度" width="100" align="center">
+                <el-table-column sortable="custom" prop="importance" label="重要度" width="90" align="center">
                     <template slot-scope="scope">
                         <!-- <el-color-picker disabled v-model="scope.row.color"></el-color-picker> -->
-                        <div class="stateStyle" style="backgroundColor:#ab32aa"></div>
+                        <!-- <div class="stateStyle" :style="{'backgroundColor':scope.row.color}"></div> -->
+                        <el-tooltip class="item" effect="dark" :content="scope.row.name" placement="right">
+                            <div class="icon iconfont icon-circle" :style="{ color: scope.row.color }"></div>
+                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
                 <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
                 <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
-                <el-table-column prop="state" label="状态" width="100" align="center">
+                <el-table-column prop="state" label="状态" width="80" align="center">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.state" class="stateStyle" style="backgroundColor:#00ff00"></div>
-                        <div v-else class="stateStyle" style="backgroundColor:#ff0000;"></div>
+                        <!-- <div v-if="scope.row.state" class="stateStyle" style="backgroundColor:#00ff00"></div>
+                        <div v-else class="stateStyle" style="backgroundColor:#ff0000;"></div> -->
+                        <el-tooltip class="item" effect="dark" content="启动" placement="right">
+                            <div v-if="scope.row.state" class="icon iconfont icon-circle" :style="{ color: '#00ff00' }"></div>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="停止" placement="right">
+                            <div v-if="!scope.row.state" class="icon iconfont icon-circle" :style="{ color: '#ff0000' }"></div>
+                        </el-tooltip>
 
                         <!-- <el-color-picker disabled v-if="scope.row.state" v-model="startColor"></el-color-picker> -->
                         <!-- <el-color-picker disabled v-else v-model="endColor"></el-color-picker> -->
@@ -87,10 +102,25 @@
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                        <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">停止</el-button>
-                        <el-button v-if="!scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">启动</el-button>
-                        <el-button type="text" @click="showVideo(scope.$index, scope.row)">查看视频</el-button>
+                        <el-button v-has="{ role: ['admin'] }" type="text" @click="handleEdit(scope.row)">修改</el-button>
+                        <el-button
+                            v-has="{ role: ['admin'] }"
+                            v-if="scope.row.state"
+                            type="text"
+                            @click="handleClose(scope.$index, scope.row)"
+                            >停止</el-button
+                        >
+                        <el-button
+                            v-has="{ role: ['admin'] }"
+                            v-if="!scope.row.state"
+                            type="text"
+                            @click="handleClose(scope.$index, scope.row)"
+                            >启动</el-button
+                        >
+                        <el-button type="text" @click="showVideo(scope.row)">查看视频</el-button>
+                        <el-button v-has="{ role: ['admin'] }" type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)"
+                            >删除</el-button
+                        >
                     </template>
                 </el-table-column>
             </el-table>
@@ -108,26 +138,53 @@
             </div>
         </div>
 
-        <!-- 添加弹出框 -->
-        <el-dialog title="添加摄像头" :visible.sync="addCameraFlag" width="40%" :before-close="handleCloseDialog">
-            <add-camera @closeAddCameraDialog="closeAddCameraDialog" ref="addCamera"></add-camera>
-        </el-dialog>
+        <!-- 添加摄像头 -->
+        <div v-if="addCameraFlag">
+            <el-dialog title="添加摄像头" :visible.sync="addCameraFlag" width="40%" :before-close="handleCloseDialog">
+                <add-camera @closeAddCameraDialog="closeAddCameraDialog" ref="addCamera"></add-camera>
+            </el-dialog>
+        </div>
 
         <!-- 设置重要等级 -->
-        <el-dialog title="设置等级" :visible.sync="addImportanceLevelFlag" width="40%" :before-close="handleCloseLevelDialog">
-            <addImportanceLevel @closeAddLevelDialog="closeAddLevelDialog" ref="addImportanceLevel"></addImportanceLevel>
-        </el-dialog>
+        <div v-if="addImportanceLevelFlag">
+            <el-dialog title="设置等级" :visible.sync="addImportanceLevelFlag" width="25%" :before-close="handleCloseLevelDialog">
+                <addImportanceLevel
+                    :importanceLevel="importanceLevel"
+                    @closeAddLevelDialog="closeAddLevelDialog"
+                    ref="addImportanceLevel"
+                ></addImportanceLevel>
+            </el-dialog>
+        </div>
+
+        <!-- 编辑摄像头 -->
+        <div v-if="editCameraFlag">
+            <el-dialog title="编辑摄像头" :visible.sync="editCameraFlag" width="40%" :before-close="handleCloseDialog">
+                <add-camera
+                    :typeName="typeName"
+                    :editRow="editRow"
+                    @closeAddCameraDialog="closeAddCameraDialog"
+                    ref="editCamera"
+                ></add-camera>
+            </el-dialog>
+        </div>
 
         <!-- 查看视频 -->
-        <el-dialog title="查看视频" :visible.sync="showVideoFlag" width="40%" :before-close="handleVideoDialog">
-            <showVideo ref="showVideo"></showVideo>
-        </el-dialog>
+        <div v-if="showVideoFlag">
+            <showVideo @closeVideo="closeVideo" :showVideoObj="showVideoObj" ref="showVideo"></showVideo>
+        </div>
     </div>
 </template>
 
 <script>
 import { getAlertEventsState } from '@/api/alertEvents.js';
-import { getDetectModelsTypes, getCamerasQuery, getCamerasCount, deleteCamerasById, updateCamerasState } from '@/api/cameraManagement.js'; //摄像头类型
+import {
+    getDetectModelsTypes,
+    getCamerasQuery,
+    getCamerasCount,
+    deleteCamerasById,
+    updateCamerasState,
+    getImportanceLevel
+} from '@/api/cameraManagement.js'; //摄像头类型
 import addCamera from '@/views/page/cameraManagement/addCamera.vue';
 import addImportanceLevel from '@/views/page/cameraManagement/addImportanceLevel.vue';
 import showVideo from '@/views/page/cameraManagement/showVideo.vue';
@@ -141,16 +198,23 @@ export default {
                 createTime: [], //报警事件创建时间
                 detectModelTypeArray: [], //摄像头检测模型
                 stateArray: [], //报警事件开启状态
+                importanceArray: [], //重要度
                 pagenation: {
                     pageNum: 1,
                     pageSize: 10
                 },
-                sort: { field: 'createTime', type: 'asc' } //排序
+                // sort: { field: 'createTime', type: 'asc' }, //排序
+                sort: {
+                    createTime: 'desc',
+                    importance: 'asc'
+                } //排序
             },
             total: 0,
             stateArray: [], //状态  启动/关闭
             detectModelTypeArray: [], //摄像头检测模型
-            addCameraFlag: false,
+            addCameraFlag: false, // 添加控制摄像头管理的开关
+            editCameraFlag: false, // 编辑控制摄像头管理的开关
+            editRow: {}, // 编辑对象
             tableData: [],
             multipleSelection: [],
             delList: [],
@@ -158,7 +222,9 @@ export default {
             addImportanceLevelFlag: false, //设置等级弹窗开关
             startColor: '#ff0000', // 开始颜色
             endColor: '#00ff00', // 结束颜色
-            showVideoFlag: false // 视频查看弹窗开关
+            showVideoFlag: false, // 视频查看弹窗开关
+            importanceLevel: [], // 重要度等级
+            showVideoObj: '' //查看的信息
         };
     },
     computed: {},
@@ -185,6 +251,8 @@ export default {
         this.getDetectModelsTypes();
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
+        //获取全部等级（重要度）
+        this.getImportanceLevel();
     },
     watch: {
         'form.createTime': {
@@ -210,10 +278,30 @@ export default {
         }
     },
     methods: {
+        // 关闭视频查看弹窗
+        closeVideo() {
+            this.showVideoFlag = false;
+        },
+        // 编辑摄像头
+        handleEdit(row) {
+            this.editCameraFlag = true;
+            this.typeName = 'edit';
+            this.editRow = row;
+        },
+        // 获取等级（重要度）
+        async getImportanceLevel() {
+            let res = await getImportanceLevel();
+            if (res.code === '0') {
+                this.importanceLevel = res.detail;
+            } else {
+                this.$message.error('获取重要度等级失败');
+            }
+        },
         // 查看视频
-        showVideo() {
+        showVideo(row) {
             console.log('点击了视频查看');
             this.showVideoFlag = true;
+            this.showVideoObj = row;
         },
         // 视频查看关闭
         handleVideoDialog() {
@@ -226,6 +314,10 @@ export default {
         // 设置重要等级
         setImportanceLevel() {
             this.addImportanceLevelFlag = true;
+            if (this.$refs.addImportanceLevel) {
+                this.$refs.addImportanceLevel.$refs.levelForm.clearValidate();
+                this.$refs.addImportanceLevel.$refs.levelForm.resetFields();
+            }
         },
         // 根据条件分页展示报警事件信息    --0227
         async getCamerasQuery(obj) {
@@ -305,12 +397,20 @@ export default {
         },
         //排序 --0227
         sortChange(column) {
+            console.log(column.prop);
             if (column.order !== null) {
-                this.form.sort.field = column.prop;
-                if (column.order === 'descending') {
-                    this.form.sort.type = 'desc';
-                } else if (column.order === 'ascending') {
-                    this.form.sort.type = 'asc';
+                if (column.prop == 'createTime') {
+                    if (column.order === 'descending') {
+                        this.form.sort.createTime = 'desc';
+                    } else if (column.order === 'ascending') {
+                        this.form.sort.createTime = 'asc';
+                    }
+                } else if (column.prop == 'importance') {
+                    if (column.order === 'descending') {
+                        this.form.sort.importance = 'desc';
+                    } else if (column.order === 'ascending') {
+                        this.form.sort.importance = 'asc';
+                    }
                 }
                 let searchObj = {};
                 if (JSON.stringify(this.form.createTime) == '[]') {
@@ -353,6 +453,7 @@ export default {
         // 关闭添加的弹窗
         closeAddCameraDialog() {
             this.addCameraFlag = false;
+            this.editCameraFlag = false;
             this.resetForm('form');
         },
         // 关闭设置重要等级的弹窗
@@ -360,9 +461,10 @@ export default {
             this.addImportanceLevelFlag = false;
             this.resetForm('form');
         },
-        // 关闭添加的弹窗
+        // 关闭添加(编辑)的弹窗
         handleCloseDialog() {
             this.addCameraFlag = false;
+            this.editCameraFlag = false;
         },
         // 删除操作
         handleDelete(index, row) {

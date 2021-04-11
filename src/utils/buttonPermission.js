@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from '@/store';
 
 Vue.directive('has', {
     bind: function(el, binding) {
@@ -12,8 +13,10 @@ Vue.directive('has', {
     }
 });
 Vue.prototype.$_has = function(role) {
-    //当前角色可以从cookie中获取
-    var currentRole = ['admin'];
+    // 当前用户角色通过vuex获取
+    // var currentRole = ['user'];
+    var currentRole = [];
+    currentRole.push(store.state.userRole);
     if (Array.isArray(role)) {
         return currentRole.some(function(ele) {
             return role.indexOf(ele) >= 0;

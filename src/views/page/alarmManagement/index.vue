@@ -48,7 +48,9 @@
                 :chartData="echartData.alarmingTrend"
                 style="height:200px;width:100%"
             ></echart>
-            <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection">批量删除</el-button>
+            <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection" v-has="{ role: ['admin'] }"
+                >批量删除</el-button
+            >
             <el-table
                 :data="tableData"
                 border
@@ -70,10 +72,13 @@
                         <span>{{ scope.$index + (form.pagenation.pageNum - 1) * form.pagenation.pageSize + 1 }} </span>
                     </template>
                 </el-table-column>
-                <el-table-column label="重要度" width="100" align="center">
+                <el-table-column sortable="custom" prop="importance" label="重要度" width="90" align="center">
                     <template slot-scope="scope">
                         <!-- <el-color-picker disabled v-model="scope.row.color"></el-color-picker> -->
-                        <div class="stateStyle" style="backgroundColor:#ab32aa"></div>
+                        <!-- <div class="stateStyle" :style="{'backgroundColor':scope.row.color}"></div> -->
+                        <el-tooltip class="item" effect="dark" :content="scope.row.level_name" placement="right">
+                            <div class="icon iconfont icon-circle" :style="{ color: scope.row.color }"></div>
+                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
@@ -87,16 +92,18 @@
                     :formatter="dateFormat"
                 ></el-table-column>
 
-                <el-table-column label="概览图" align="center">
+                <el-table-column label="概览图1" align="center">
                     <template slot-scope="scope">
-                        <el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
+                        <el-image class="table-td-thumb" :src="scope.row.pic_url" :preview-src-list="[scope.row.pic_url]"></el-image>
                     </template>
                 </el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <!-- <el-button type="text" @click="handleEdit(scope.$index, scope.row)">详情</el-button> -->
-                        <el-button type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button v-has="{ role: ['admin'] }" type="text" style="color:red" @click="handleDelete(scope.$index, scope.row)"
+                            >删除</el-button
+                        >
                         <el-button v-if="scope.row.state" type="text" @click="handleClose(scope.$index, scope.row)">关闭</el-button>
                     </template>
                 </el-table-column>
@@ -128,11 +135,13 @@ import {
     getAlertEventsQuery,
     deleteAlertEventsById,
     closeAlertEventsById,
-    deleteAlertEventsByArr
+    deleteAlertEventsByArr,
+    querySymbolSize
 } from '@/api/alertEvents.js';
 import { getDetectModelsTypes } from '@/api/cameraManagement.js'; //摄像头类型
 import Echart from '@/components/common/Echart';
 import setRequestTime from '@/views/page/alarmManagement/setRequestTime.vue';
+import { mapState } from 'vuex';
 export default {
     name: 'alarmManagement',
     data() {
@@ -160,10 +169,12 @@ export default {
                 x: [],
                 data: []
             },
+            linshi: {},
             echartData: {
                 alarmingTrend: {}
             },
-            setRequestTimeFlag: false //请求时间弹窗开关
+            setRequestTimeFlag: false, //请求时间弹窗开关
+            interval: null //请求刷新定时器
         };
     },
     props: {
@@ -176,6 +187,9 @@ export default {
         Echart,
         setRequestTime
     },
+    computed: {
+        ...mapState(['refreshBlank'])
+    },
     created() {
         //获取所有状态信息，用于分类筛选
         this.getAlertEventsState();
@@ -185,12 +199,23 @@ export default {
         this.getAlertEventsQuery(searchObj);
 
         //报警事件总量查询
-        let obj = JSON.parse(JSON.stringify(this.form));
-        delete obj.sort;
-        delete obj.pagenation;
+        // let obj = JSON.parse(JSON.stringify(this.form));
+        // delete obj.sort;
+        // delete obj.pagenation;
         // this.getAlertEventsCount(obj);
+
         //检测模型类别查询接口
         this.getDetectModelsTypes();
+
+        if (this.type === 'realTimeMonitoring') {
+            let symbolSizeObj = JSON.parse(JSON.stringify(this.form));
+            symbolSizeObj.createTime = {};
+            symbolSizeObj.detectModelTypeArray = [1];
+            delete symbolSizeObj.sort;
+            delete symbolSizeObj.pagenation;
+            //获取symbolSize图表
+            this.querySymbolSize(symbolSizeObj);
+        }
     },
     watch: {
         // createTime: {
@@ -213,16 +238,25 @@ export default {
             handler(newVal) {
                 console.log(newVal);
             }
+        },
+        refreshBlank(newVal) {
+            let time = Number(newVal);
+            this.interval = setInterval(() => {
+                this.resetForm('form');
+            }, time * 1000);
         }
     },
-    mounted() {
-        if (this.type === 'realTimeMonitoring') {
-            this.alarmingTrendData.x = ['静电服', '安全帽', '指示灯'];
-            this.alarmingTrendData.data = [150, 310, 500];
-            this.echartData.alarmingTrend = this.drawEchart(this.alarmingTrendData.data, this.alarmingTrendData.x);
-        }
-    },
+    mounted() {},
     methods: {
+        // 获取实时监控symbolsize图标
+        async querySymbolSize(obj) {
+            let { detail: res } = await querySymbolSize(obj);
+            res.series.forEach(item => {
+                this.alarmingTrendData.x.push(item.name);
+                this.alarmingTrendData.data.push(item.value);
+            });
+            this.echartData.alarmingTrend = this.drawEchart(this.alarmingTrendData.data, this.alarmingTrendData.x);
+        },
         // 关闭设置请求时间弹窗
         closeSetTimeDialog() {
             this.setRequestTimeFlag = false;
@@ -234,9 +268,7 @@ export default {
         // 设置请求时间
         setRequestTime() {
             this.setRequestTimeFlag = true;
-
             if (this.$refs.setRequestTime) {
-                console.log(this.$refs.setRequestTime.$refs.timeForm);
                 this.$refs.setRequestTime.$refs.timeForm.resetFields();
             }
         },
@@ -272,8 +304,13 @@ export default {
                     {
                         name: '总量',
                         type: 'effectScatter',
-                        symbolSize: function() {
-                            return 15;
+                        color: '#f00',
+                        symbolSize: function(data) {
+                            if (data > 50) {
+                                return 50;
+                            } else {
+                                return data;
+                            }
                         },
                         data: data
                     }
@@ -375,6 +412,17 @@ export default {
             // delete obj.sort;
             // delete obj.pagenation;
             // this.getAlertEventsCount(obj);
+
+            // 获取图表
+            if (this.type === 'realTimeMonitoring') {
+                let symbolSizeObj = JSON.parse(JSON.stringify(this.form));
+                symbolSizeObj.createTime = {};
+                symbolSizeObj.detectModelTypeArray = [1];
+                delete symbolSizeObj.sort;
+                delete symbolSizeObj.pagenation;
+                //获取symbolSize图表
+                this.querySymbolSize(symbolSizeObj);
+            }
         },
         // 关闭操作
         handleClose(index, row) {
@@ -484,7 +532,6 @@ export default {
                         let res = await deleteAlertEventsByArr({
                             idsArray: delArr
                         });
-                        console.log(res);
                         if (res.code == 0) {
                             this.$message({
                                 type: 'success',
@@ -509,6 +556,21 @@ export default {
                     type: 'warning'
                 });
             }
+        }
+    },
+    // keep-alive  进入
+    activated() {
+        if (this.type === 'realTimeMonitoring') {
+            this.interval = setInterval(() => {
+                this.resetForm('form');
+            }, this.refreshBlank * 1000);
+        }
+    },
+    // keep-alive  离开
+    deactivated() {
+        if (this.type === 'realTimeMonitoring') {
+            clearInterval(this.interval);
+            this.interval = null;
         }
     }
 };

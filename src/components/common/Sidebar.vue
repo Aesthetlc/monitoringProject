@@ -20,16 +20,20 @@
                         <template v-for="subItem in item.subs">
                             <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
                                 <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
-                                    threeItem.title
-                                }}</el-menu-item>
+                                <el-menu-item
+                                    v-if="item.meta.role.includes(userRole)"
+                                    v-for="(threeItem, i) in subItem.subs"
+                                    :key="i"
+                                    :index="threeItem.index"
+                                    >{{ threeItem.title }}</el-menu-item
+                                >
                             </el-submenu>
                             <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
                         </template>
                     </el-submenu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
+                    <el-menu-item v-if="item.meta.role.includes(userRole)" :index="item.index" :key="item.index">
                         <i :class="item.icon"></i>
                         <span slot="title">{{ item.title }}</span>
                     </el-menu-item>
@@ -41,6 +45,7 @@
 
 <script>
 import bus from '@/components/common/bus';
+import { mapState } from 'vuex';
 export default {
     data() {
         return {
@@ -49,32 +54,50 @@ export default {
                 {
                     icon: 'el-icon-lx-home',
                     index: '/home',
-                    title: '系统首页'
+                    title: '系统首页',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
                 },
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/realTimeMonitoring',
-                    title: '实时监控'
+                    title: '实时监控',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
                 },
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/alarmManagement',
-                    title: '报警管理'
+                    title: '报警管理',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
                 },
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/policeStatistics',
-                    title: '报警统计'
+                    title: '报警统计',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
                 },
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/cameraManagement',
-                    title: '摄像头管理'
+                    title: '摄像头管理',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
                 },
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/userManagement',
-                    title: '用户管理'
+                    title: '用户管理',
+                    meta: {
+                        role: ['admin']
+                    }
                 }
             ]
         };
@@ -82,7 +105,8 @@ export default {
     computed: {
         onRoutes() {
             return this.$route.path;
-        }
+        },
+        ...mapState(['userRole'])
     },
     created() {
         // 通过 Event Bus 进行组件间通信，来折叠侧边栏

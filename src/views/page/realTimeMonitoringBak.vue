@@ -43,7 +43,7 @@
 
                 <el-table-column label="概览图" align="center">
                     <template slot-scope="scope">
-                        <el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
+                        <el-image class="table-td-thumb" :src="scope.row.pic_url" :preview-src-list="[scope.row.pic_url]"></el-image>
                     </template>
                 </el-table-column>
 

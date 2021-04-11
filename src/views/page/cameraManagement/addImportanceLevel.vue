@@ -1,44 +1,63 @@
 <template>
-    <el-form :inline="true" :model="levelForm" ref="levelForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="等级1">
-            <el-color-picker v-model="levelForm.levelFirst"></el-color-picker>
-        </el-form-item>
-        <el-form-item label="等级2">
-            <el-color-picker v-model="levelForm.levelSecond"></el-color-picker>
-        </el-form-item>
-        <el-form-item label="等级3">
-            <el-color-picker v-model="levelForm.levelThird"></el-color-picker>
-        </el-form-item>
-        <el-form-item label="等级4">
-            <el-color-picker v-model="levelForm.levelFourth"></el-color-picker>
-        </el-form-item>
-        <el-form-item label="等级5">
-            <el-color-picker v-model="levelForm.levelFifth"></el-color-picker>
-        </el-form-item>
+    <div>
+        <el-table :data="levelTableData" style="width: 100%">
+            <el-table-column label="级别" align="center" width="100">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.level }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="名称" align="center">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px"><el-input v-model="scope.row.name" placeholder="请输入内容"></el-input></span>
+                </template>
+            </el-table-column>
+            <el-table-column label="颜色" align="center" width="100">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px"><el-color-picker v-model="scope.row.color"></el-color-picker></span>
+                </template>
+            </el-table-column>
+        </el-table>
         <div style="text-align:right">
             <el-button type="primary" @click="submitForm('levelForm')">提交</el-button>
             <el-button @click="cancelForm('levelForm')">取消</el-button>
         </div>
-    </el-form>
+    </div>
 </template>
 
 <script>
+import { updateImportanceLevel } from '@/api/cameraManagement.js'; //摄像头类型
 export default {
     data() {
         return {
-            levelForm: {
-                levelFirst: null,
-                levelSecond: null,
-                levelThird: null,
-                levelFourth: null,
-                levelFifth: null
-            }
+            levelTableData: []
         };
+    },
+    props: {
+        importanceLevel: {
+            type: Array,
+            default: () => {
+                [];
+            }
+        }
+    },
+    watch: {},
+    mounted() {
+        this.levelTableData = JSON.parse(JSON.stringify(this.importanceLevel));
     },
     methods: {
         //提交
-        submitForm() {
-            this.$emit('closeAddLevelDialog');
+        async submitForm() {
+            let searchObj = JSON.parse(JSON.stringify(this.levelTableData));
+            let res = await updateImportanceLevel(searchObj);
+            if (res.code == 0) {
+                this.$message({
+                    type: 'success',
+                    message: '修改成功!'
+                });
+                this.$emit('closeAddLevelDialog');
+            } else {
+                this.$message.error(res.content);
+            }
         },
         // 取消
         cancelForm() {
