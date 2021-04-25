@@ -1,0 +1,78 @@
+{
+  "code": "0",
+  "msg": "success",
+  "data": [
+    {
+      "rackId": 1,
+      "rackName": "机柜1",
+      "objs": [
+        {
+          "objId": "uuid1",
+          "name": "浪潮NF5280M5",
+          "uId": 1,
+          "rackId": 1
+        },
+        {
+          "objId": "uuid1",
+          "name": "浪潮NF5280M5",
+          "uId": 2,
+          "rackId": 1
+        },
+        {
+          "objId": "uuid1",
+          "name": "浪潮NF5280M5",
+          "uId": 3,
+          "rackId": 1
+        },
+        {
+          "objId": "uuid2",
+          "name": "浪潮NF5280M5",
+          "uId": 4,
+          "rackId": 1
+        },
+        {
+          "objId": "uuid2",
+          "name": "浪潮NF5280M5",
+          "uId": 5,
+          "rackId": 1
+        }
+      ]
+    },
+    {
+      "rackId": 2,
+      "rackName": "机柜2",
+      "objs": [
+        {
+          "objId": "uuid3",
+          "name": "浪潮NF5280M5",
+          "uId": 1,
+          "rackId": 2
+        },
+        {
+          "objId": "uuid3",
+          "name": "浪潮NF5280M5",
+          "uId": 2,
+          "rackId": 2
+        },
+        {
+          "objId": "uuid3",
+          "name": "浪潮NF5280M5",
+          "uId": 3,
+          "rackId": 2
+        },
+        {
+          "objId": "uuid4",
+          "name": "浪潮NF5280M5",
+          "uId": 4,
+          "rackId": 2
+        },
+        {
+          "objId": "uuid4",
+          "name": "浪潮NF5280M5",
+          "uId": 5,
+          "rackId": 2
+        }
+      ]
+    }
+  ]
+}

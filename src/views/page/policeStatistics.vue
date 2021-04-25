@@ -810,7 +810,6 @@ export default {
         //报警量分类统计
         drawAlarmClassification(dataTitle, data) {
             var option = {
-                color: ['#3398DB'],
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -836,6 +835,20 @@ export default {
                     {
                         type: 'bar',
                         barWidth: 30,
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    var colorList = [
+                                        'rgb(203,155,255)',
+                                        'rgb(149,162,255)',
+                                        'rgb(58,186,255)',
+                                        'rgb(119,168,249)',
+                                        'rgb(235,161,159)'
+                                    ];
+                                    return colorList[params.dataIndex];
+                                }
+                            }
+                        },
                         data: data
                     }
                 ]

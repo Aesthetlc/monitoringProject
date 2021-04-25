@@ -92,7 +92,7 @@
                     :formatter="dateFormat"
                 ></el-table-column>
 
-                <el-table-column label="概览图1" align="center">
+                <el-table-column label="概览图" align="center">
                     <template slot-scope="scope">
                         <el-image class="table-td-thumb" :src="scope.row.pic_url" :preview-src-list="[scope.row.pic_url]"></el-image>
                     </template>
@@ -152,7 +152,7 @@ export default {
                 stateArray: [], //报警事件开启状态
                 detectModelTypeArray: [], //摄像头检测模型
                 createTime: [], //报警事件创建时间
-                sort: { field: 'id', type: 'asc' }, //排序
+                sort: { field: 'create_time', type: 'desc' }, //排序
                 pagenation: {
                     pageNum: 1,
                     pageSize: 10
@@ -210,7 +210,7 @@ export default {
         if (this.type === 'realTimeMonitoring') {
             let symbolSizeObj = JSON.parse(JSON.stringify(this.form));
             symbolSizeObj.createTime = {};
-            symbolSizeObj.detectModelTypeArray = [1];
+            // symbolSizeObj.detectModelTypeArray = [];
             delete symbolSizeObj.sort;
             delete symbolSizeObj.pagenation;
             //获取symbolSize图表
@@ -250,6 +250,8 @@ export default {
     methods: {
         // 获取实时监控symbolsize图标
         async querySymbolSize(obj) {
+            this.alarmingTrendData.x = [];
+            this.alarmingTrendData.data = [];
             let { detail: res } = await querySymbolSize(obj);
             res.series.forEach(item => {
                 this.alarmingTrendData.x.push(item.name);
@@ -417,7 +419,7 @@ export default {
             if (this.type === 'realTimeMonitoring') {
                 let symbolSizeObj = JSON.parse(JSON.stringify(this.form));
                 symbolSizeObj.createTime = {};
-                symbolSizeObj.detectModelTypeArray = [1];
+                // symbolSizeObj.detectModelTypeArray = [];
                 delete symbolSizeObj.sort;
                 delete symbolSizeObj.pagenation;
                 //获取symbolSize图表

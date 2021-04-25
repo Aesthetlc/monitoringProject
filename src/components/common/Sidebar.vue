@@ -93,6 +93,14 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
+                    index: '/home/cabinetManagement',
+                    title: '柜机管理',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
                     index: '/home/userManagement',
                     title: '用户管理',
                     meta: {

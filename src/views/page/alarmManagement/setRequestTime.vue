@@ -6,10 +6,10 @@
             </el-select>
         </el-form-item>
 
-        <el-form-item label="静音时间段" prop="timeTips">
+        <el-form-item style="width:100%" label="静音时间段" prop="timeTips">
             <el-time-select
                 placeholder="起始时间"
-                style="width:47%"
+                style="width:50%"
                 v-model="timeForm.startTime"
                 :picker-options="{
                     start: '00:00',
@@ -18,10 +18,10 @@
                 }"
             >
             </el-time-select>
-            ---
+
             <el-time-select
                 placeholder="结束时间"
-                style="width:47%"
+                style="width:50%"
                 v-model="timeForm.endTime"
                 :picker-options="{
                     start: '00:00',

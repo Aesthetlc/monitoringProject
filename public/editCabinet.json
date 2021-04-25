@@ -1,0 +1,17 @@
+{
+    "code": "0",
+    "msg": "success",
+    "data": [{
+            "objId": "uuid1",
+            "name": "浪潮NF5280M5",
+            "uId": 1,
+            "height": 3
+        },
+        {
+            "objId": "uuid2",
+            "name": "浪潮NF5280M5",
+            "uId": 5,
+            "height": 2
+        }
+    ]
+}

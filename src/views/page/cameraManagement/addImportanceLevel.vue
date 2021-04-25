@@ -35,9 +35,7 @@ export default {
     props: {
         importanceLevel: {
             type: Array,
-            default: () => {
-                [];
-            }
+            default: () => []
         }
     },
     watch: {},

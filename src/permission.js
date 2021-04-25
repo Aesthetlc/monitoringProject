@@ -1,6 +1,5 @@
 import router from './router/index.js';
 import Cookies from 'js-cookie';
-import store from '@/store';
 
 const whiteList = ['/login']; // no redirect whitelist
 // 全局前置守卫
