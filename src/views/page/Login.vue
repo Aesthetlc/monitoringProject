@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">后台监控系统</div>
+            <div class="ms-title">视频监控系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="userName">
                     <el-input v-model="param.userName" placeholder="请输入用户名">
@@ -37,6 +37,9 @@ export default {
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
             }
         };
+    },
+    mounted() {
+        // console.log(Cookies.get('monitoringIpArr'));
     },
     methods: {
         ...mapMutations(['setUserId', 'setUserRole']),

@@ -93,8 +93,8 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: '/home/cabinetManagement',
-                    title: '柜机管理',
+                    index: '/home/monitoringShow',
+                    title: '监控查看',
                     meta: {
                         role: ['admin', 'user']
                     }

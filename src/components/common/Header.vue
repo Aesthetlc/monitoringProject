@@ -5,7 +5,7 @@
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">后台监控系统</div>
+        <div class="logo">视频监控系统</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -33,7 +33,7 @@
     </div>
 </template>
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 import Cookies from 'js-cookie';
 import bus from '@/components/common/bus';
 export default {
@@ -50,10 +50,11 @@ export default {
             // let username = sessionStorage.getItem('ms_username');
             let username = Cookies.get('token');
             return username ? username : this.name;
-        }
+        },
+        ...mapState(['userId', 'ipArr', 'sourceObj'])
     },
     methods: {
-        ...mapMutations(['emptyMonitoringArr']),
+        ...mapMutations(['emptyMonitoringArr', 'updateMonitoringIpArr']),
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
@@ -65,6 +66,18 @@ export default {
                 Cookies.remove('refreshTime'); // 移除请求时间间隔
                 this.emptyMonitoringArr();
                 this.closeSSE(this.$store.state.userId);
+                this.ipArr.forEach(item => {
+                    if (item.showFlag) {
+                        let source = 'source' + item.id;
+                        this.sourceObj[source].close();
+                        // 结束订阅，断开长链接
+                        const httpRequest = new XMLHttpRequest();
+                        httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}`, false);
+                        // 更新vuex里面的ipArr
+                        this.updateMonitoringIpArr(item);
+                        Cookies.set('monitoringIpArr', JSON.stringify(this.ipArr));
+                    }
+                });
                 this.$router.push('/login');
             }
         },

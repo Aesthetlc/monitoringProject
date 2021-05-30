@@ -21,13 +21,23 @@ const store = new Vuex.Store({
         // 静音时间段结束时间
         muteEndTime: '',
         // 请求时间间隔
-        refreshBlank: ''
+        refreshBlank: '',
+        // 监控查看
+        ipArr: [
+            { id: 1, ip: '10.221.170.1', showFlag: false },
+            { id: 2, ip: '10.221.170.2', showFlag: false },
+            { id: 3, ip: '10.221.170.3', showFlag: false },
+            { id: 4, ip: '10.221.170.4', showFlag: false },
+            { id: 5, ip: '10.221.170.5', showFlag: false },
+            { id: 6, ip: '10.221.170.6', showFlag: false }
+        ],
+        sourceObj: {}
     },
     mutations: {
         changeCollapse(state) {
             state.isCollapse = !state.isCollapse;
         },
-        //设置uderId
+        //设置userId
         setUserId(state, params) {
             state.userId = params;
             Cookies.set('userId', params);
@@ -51,10 +61,9 @@ const store = new Vuex.Store({
         },
         //添加预警信息
         addMonitoringArr(state, params) {
-            Notification({
-                title: params.camera,
-                message: params.describe,
-                type: 'success'
+            Notification.error({
+                title: params.describe,
+                message: params.ip + ' --- ' + params.location
             });
             // 组装对比时间  例如：2021/03/07  +   时分秒
             let sTime = new Date(utils.getNowTimeNoHour() + ' ' + state.muteStartTime);
@@ -87,7 +96,25 @@ const store = new Vuex.Store({
         //从session取到值直接赋值给预警信息
         updateMonitoringArr(state, params) {
             state.monitoringArr = params;
-        }
+        },
+        //从cookie中取到的ipArr赋值到vuex中
+        getMonitoringArr(state, params) {
+            state.ipArr = params;
+        },
+        //修改监控查看ipArr 的showFlag 控制视频的开关
+        updateMonitoringIpArr(state, params) {
+            state.ipArr.forEach(it => {
+                if (it.id == params.id) {
+                    it.showFlag = !params.showFlag;
+                }
+            });
+        },
+        updateSourceObj(state, params) {
+            state.sourceObj[params.source] = params.val;
+        },
+        getSourceObj(state, params) {
+            state.sourceObj = params;
+        },
     },
     actions: {
         //获取静音时间段

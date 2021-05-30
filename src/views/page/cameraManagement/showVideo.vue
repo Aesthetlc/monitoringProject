@@ -1,5 +1,5 @@
 <template>
-    <el-dialog :title="`查看${showVideoObj.ip}`" width="40%" :visible.sync="showVideoFlag" :before-close="handleVideoDialog">
+    <el-dialog :title="`${showVideoObj.ip}实时监控`" width="70%" :visible.sync="showVideoFlag" :before-close="handleVideoDialog">
         <img id="img" width="100%" />
     </el-dialog>
 </template>
@@ -54,4 +54,20 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.el-dialog {
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+}
+.el-dialog .el-dialog__body {
+    flex: 1;
+    overflow: auto;
+}
+</style>

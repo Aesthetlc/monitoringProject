@@ -2,7 +2,7 @@
     <div>
         <div class="container">
             <div>
-                <el-form ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
+                <el-form style="overflow:hidden" ref="form" class="demo-form-inline" inline :model="form" label-width="90px">
                     <el-form-item label="摄像机ip" prop="ip">
                         <el-input style="width:150px" v-model="form.ip" placeholder="请输入摄像机ip"></el-input>
                     </el-form-item>
@@ -11,14 +11,14 @@
                     </el-form-item>
                     <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
                         <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
-                            <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
-                            </el-option>
+                            <!-- <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option> -->
                         </el-select>
                     </el-form-item>
                     <!-- 实时监控 判断点 -->
                     <el-form-item v-if="type !== 'realTimeMonitoring'" label="开启状态" prop="stateArray">
                         <el-select style="width:150px" v-model="form.stateArray" multiple placeholder="筛选状态">
-                            <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                            <!-- <el-option v-for="item in stateArray" :key="item.value" :label="item.label" :value="item.value"> </el-option> -->
                         </el-select>
                     </el-form-item>
                     <el-form-item label="报警时间" prop="createTime">
@@ -48,6 +48,29 @@
                 :chartData="echartData.alarmingTrend"
                 style="height:200px;width:100%"
             ></echart>
+
+            <el-card v-if="type === 'realTimeMonitoring'" class="box-card">
+                <div slot="header">
+                    <span>监控图像</span>
+                </div>
+                <div class="warningImgBorder">
+                    <!-- key +10的原因 保证跟下方的暂无数据的key 不相同 -->
+                    <div v-for="(item, index) in monitoringArr" :key="index + 10" class="warningImg">
+                        <div style="width:50%;height:100%;display: flex;justify-content: space-between;align-items: center;">
+                            <el-image style="width: 100%; height: 80%" :src="item.img" fit="contain"></el-image>
+                        </div>
+
+                        <div style="width:50%">
+                            <p>位置:{{ item.location }}</p>
+                            <p>IP:{{ item.ip }}</p>
+                        </div>
+                    </div>
+                    <div v-for="(ite, ind) in 8 - monitoringArr.length" :key="ind + Math.random()" class="warningImg">
+                        <h1>暂无数据</h1>
+                    </div>
+                </div>
+            </el-card>
+
             <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection" v-has="{ role: ['admin'] }"
                 >批量删除</el-button
             >
@@ -82,7 +105,11 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="position" label="摄像机位置" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.position | formatEmpty }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
                 <el-table-column
                     sortable="custom"
@@ -188,7 +215,7 @@ export default {
         setRequestTime
     },
     computed: {
-        ...mapState(['refreshBlank'])
+        ...mapState(['refreshBlank', 'monitoringArr'])
     },
     created() {
         //获取所有状态信息，用于分类筛选
@@ -598,6 +625,35 @@ export default {
 .red {
     color: #ff0000;
 }
+
+.warningImgBorder {
+    height: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.warningImg {
+    border: 1px solid #999;
+    width: 24%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/deep/ .el-card__header {
+    padding: 7px 10px;
+}
+
 .mr10 {
     margin-right: 10px;
 }

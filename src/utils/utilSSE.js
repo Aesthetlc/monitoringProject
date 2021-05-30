@@ -12,8 +12,8 @@ let createSSE = (id) => {
         let path = window.location.href;
         path = path.substring(0, path.indexOf('#'));
         source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${id}`);
+        // source = new EventSource(`http://127.0.0.1:8081/api/alert-events/subscribe?id=${id}`);
         // source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
-        console.log(source);
 
         initSSE();
     } catch (e) {
@@ -47,7 +47,7 @@ let initSSE = () => {
     source.addEventListener(
         'open',
         function() {
-            console.log('建立连接');
+            console.log('建立连接成功，sse长连接');
             isConnect = true;
         },
         false
@@ -58,16 +58,14 @@ let initSSE = () => {
      * 另一种写法：source.onmessage = function (event) {}
      */
     source.addEventListener('message', function(e) {
-        console.log('客户端收到服务器发来的数据');
 
         let mes = JSON.parse(e.data);
-        let mesObj = JSON.parse(window.atob(mes.body));
-        console.log(mesObj);
-        if (store.state.monitoringArr.length >= 20) {
+        
+        if (store.state.monitoringArr.length >= 8) {
             store.commit('deleteMonitoringArr');
-            store.commit('addMonitoringArr', mesObj);
+            store.commit('addMonitoringArr', mes);
         } else {
-            store.commit('addMonitoringArr', mesObj);
+            store.commit('addMonitoringArr', mes);
         }
     });
 
@@ -134,6 +132,7 @@ let closeSSE = (id) => {
     source.close();
     const httpRequest = new XMLHttpRequest();
     httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${id}`, true);
+    // httpRequest.open('get', `http://127.0.0.1:8081/api/alert-events/close?id=${id}`, true);
     httpRequest.send();
     console.log('close');
 };

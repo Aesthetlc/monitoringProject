@@ -67,29 +67,50 @@
                 </el-table-column>
                 <el-table-column sortable="custom" prop="importance" label="重要度" width="90" align="center">
                     <template slot-scope="scope">
-                        <!-- <el-color-picker disabled v-model="scope.row.color"></el-color-picker> -->
-                        <!-- <div class="stateStyle" :style="{'backgroundColor':scope.row.color}"></div> -->
                         <el-tooltip class="item" effect="dark" :content="scope.row.name" placement="right">
                             <div class="icon iconfont icon-circle" :style="{ color: scope.row.color }"></div>
                         </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
-                <el-table-column prop="position" label="摄像机位置" align="center"></el-table-column>
+                <el-table-column prop="position" label="摄像机位置" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.position | formatEmpty }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="fps" label="帧数" align="center" width="50">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.fps | formatEmpty }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="currentNum" label="出入口" align="center" width="70">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.currentNum | formatEmpty }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="pic" label="图像" align="center">
+                    <template slot-scope="scope">
+                        <el-image
+                            v-if="scope.row.pic"
+                            class="table-td-thumb"
+                            :src="scope.row.pic + '?' + Math.random()"
+                            :preview-src-list="[scope.row.pic]"
+                        ></el-image>
+                        <span v-else>--</span>
+                    </template>
+                </el-table-column>
+
                 <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
+
                 <el-table-column prop="state" label="状态" width="80" align="center">
                     <template slot-scope="scope">
-                        <!-- <div v-if="scope.row.state" class="stateStyle" style="backgroundColor:#00ff00"></div>
-                        <div v-else class="stateStyle" style="backgroundColor:#ff0000;"></div> -->
                         <el-tooltip class="item" effect="dark" content="启动" placement="right">
                             <div v-if="scope.row.state" class="icon iconfont icon-circle" :style="{ color: '#00ff00' }"></div>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="停止" placement="right">
                             <div v-if="!scope.row.state" class="icon iconfont icon-circle" :style="{ color: '#ff0000' }"></div>
                         </el-tooltip>
-
-                        <!-- <el-color-picker disabled v-if="scope.row.state" v-model="startColor"></el-color-picker> -->
-                        <!-- <el-color-picker disabled v-else v-model="endColor"></el-color-picker> -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -228,7 +249,6 @@ export default {
         };
     },
     computed: {},
-    mounted() {},
     components: {
         addCamera,
         addImportanceLevel,

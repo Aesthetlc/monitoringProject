@@ -86,7 +86,19 @@ export function updateCameras(data) {
             ip: data.ip,
             position: data.position,
             detectModelId: -1, //  这个字段算便写 编辑的时候  后台不会读取这个字段
-            importanceId: data.importanceId
+            importanceId: data.importanceId,
+            coord:data.coord,
+            currentNum:data.currentNum,
+            fps:data.fps,
+            pic:data.pic
         }
+    });
+}
+
+//获取编辑图片的url --0227
+export function getSrcFromCanvas(ip) {
+    return request({
+        url: `proxy/api/cameras/pic/${ip}`,
+        method: 'get'
     });
 }

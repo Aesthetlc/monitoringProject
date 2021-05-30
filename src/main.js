@@ -4,6 +4,7 @@ import router from './permission';
 import ElementUI from 'element-ui';
 import echarts from 'echarts';
 import store from './store';
+import * as filters from './filters'; // global filters
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/icon/iconfont.css';
@@ -18,6 +19,9 @@ Vue.config.productionTip = false;
 
 Vue.use(ElementUI, {
     size: 'small'
+});
+Object.keys(filters).forEach(key => {
+    Vue.filter(key, filters[key]);
 });
 
 // 导入util

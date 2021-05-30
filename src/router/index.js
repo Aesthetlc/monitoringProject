@@ -44,16 +44,16 @@ export default new Router({
                     meta: { title: '摄像头管理', role: ['admin', 'user'] }
                 },
                 {
-                    name: '柜机管理',
-                    path: 'cabinetManagement',
-                    component: () => import('../views/page/cabinetManagement'),
-                    meta: { title: '柜机管理', role: ['admin', 'user'] }
-                },
-                {
                     name: '用户管理',
                     path: 'userManagement',
                     component: () => import('../views/page/userManagement'),
                     meta: { title: '用户管理', role: ['admin'] }
+                },
+                {
+                    name: '监控查看',
+                    path: 'monitoringShow',
+                    component: () => import('../views/page/monitoringShow'),
+                    meta: { title: '监控查看', role: ['admin', 'user'] }
                 },
                 {
                     path: '404',
