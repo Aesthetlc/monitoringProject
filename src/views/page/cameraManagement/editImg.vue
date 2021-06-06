@@ -86,6 +86,7 @@ const customTheme = {
     'common.backgroundImage': 'none',
     'common.backgroundColor': '#fff',
     'common.border': '1px solid #fff',
+    'common.marginTop': '60px',
     // header
     'header.backgroundImage': 'none',
     'header.backgroundColor': '#f3f4f6',
@@ -280,10 +281,17 @@ export default {
 .tui-image-editor-container {
     background-color: #fff;
 }
-/deep/.tui-image-editor-container .tui-image-editor-main-container {
-    bottom: 0 !important;
+.tui-image-editor {
+    padding-bottom: 56%;
+    width: 100%;
+    position: relative;
+    margin-top: 200px;
 }
-/* /deep/.tui-image-editor-container .tui-image-editor-wrap .tui-image-editor-size-wrap .tui-image-editor-align-wrap {
-    vertical-align: bottom !important;
-} */
+canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 </style>

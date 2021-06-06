@@ -103,6 +103,7 @@ export default {
                 coord: [] //坐标数组
             },
             detectModelId: '', //模型Id
+            sendToDataTemp: {}, //编辑图片传过来的信息
             rules: {
                 ip: [
                     { required: true, message: '请输入摄像头ip', trigger: 'blur' },
@@ -136,14 +137,14 @@ export default {
     methods: {
         // 重置图片
         resetImg() {
-            this.ruleForm.pic = '';
+            // this.ruleForm.pic = '';
             this.getSrcFromCanvas(this.ruleForm.ip);
         },
         // 子组件发送数据过来
         sendToData(obj) {
             this.dialogVisible = false;
+            this.sendToDataTemp = obj;
             this.ruleForm.pic = obj.imgUrl;
-            this.ruleForm.coord = obj.positionArr;
         },
         //编辑图片 获取图片base64
         async getSrcFromCanvas(ip) {
@@ -169,7 +170,7 @@ export default {
                     this.ruleForm.modelType = obj.detectModelType; // 这个字段算便写 编辑的时候  后台不会读取这个字段
                     this.ruleForm.fps = obj.fps;
                     this.ruleForm.currentNum = obj.currentNum;
-                    this.ruleForm.pic = obj.pic;
+                    this.ruleForm.pic = obj.pic + '?' + Math.random();
                     this.ruleForm.coord = obj.coord;
                     //回显等级
                     this.importanceLevel.forEach(item => {
@@ -186,6 +187,7 @@ export default {
             this.$refs[formName].validate(async valid => {
                 if (valid) {
                     if (this.typeName === 'edit') {
+                        this.ruleForm.coord = this.sendToDataTemp.positionArr;
                         let obj = JSON.parse(JSON.stringify(this.ruleForm));
                         obj.coord = JSON.stringify(obj.coord);
                         obj.fps = parseInt(obj.fps);
@@ -202,6 +204,7 @@ export default {
                             this.$message.error(res.content);
                         }
                     } else {
+                        this.ruleForm.coord = this.sendToDataTemp.positionArr;
                         let obj = JSON.parse(JSON.stringify(this.ruleForm));
                         obj.coord = JSON.stringify(obj.coord);
                         obj.fps = parseInt(obj.fps);
@@ -227,6 +230,10 @@ export default {
             });
         },
         closeDialog() {
+            if (JSON.stringify(this.editRow) != '{}' && this.typeName === 'edit') {
+                let obj = JSON.parse(JSON.stringify(this.editRow));
+                this.ruleForm.pic = obj.pic + '?' + Math.random();
+            }
             this.$emit('closeAddCameraDialog');
         }
     }

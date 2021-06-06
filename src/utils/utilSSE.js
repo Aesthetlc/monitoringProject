@@ -11,9 +11,8 @@ let createSSE = (id) => {
     try {
         let path = window.location.href;
         path = path.substring(0, path.indexOf('#'));
-        source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${id}`);
-        // source = new EventSource(`http://127.0.0.1:8081/api/alert-events/subscribe?id=${id}`);
-        // source = new EventSource(`${path}proxy/api/alert-events/subscribe?id=${userId}`);
+        // source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${id}`);
+        source = new EventSource(`proxy/api/alert-events/subscribe?id=${id}`);
 
         initSSE();
     } catch (e) {
@@ -131,8 +130,8 @@ let initSSE = () => {
 let closeSSE = (id) => {
     source.close();
     const httpRequest = new XMLHttpRequest();
-    httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${id}`, true);
-    // httpRequest.open('get', `http://127.0.0.1:8081/api/alert-events/close?id=${id}`, true);
+    // httpRequest.open('get', `http://8.141.53.8:8081/api/alert-events/close?id=${id}`, true);
+    httpRequest.open('get', `proxy/api/alert-events/close?id=${id}`, true);
     httpRequest.send();
     console.log('close');
 };

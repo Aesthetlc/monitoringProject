@@ -95,7 +95,7 @@
                             v-if="scope.row.pic"
                             class="table-td-thumb"
                             :src="scope.row.pic + '?' + Math.random()"
-                            :preview-src-list="[scope.row.pic]"
+                            :preview-src-list="[scope.row.pic + '?' + Math.random()]"
                         ></el-image>
                         <span v-else>--</span>
                     </template>
