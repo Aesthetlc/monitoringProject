@@ -40,7 +40,7 @@ export default {
         showVideo(item) {
             let source = 'source' + item.id;
             if (item.showFlag == false) {
-                let val = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${item.ip}`);
+                let val = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${item.ip}&alert=1`);
                 this.updateSourceObj({ source, val });
                 this.sourceObj[source].onopen = function(event) {
                     console.log('连接创建open');
@@ -63,7 +63,7 @@ export default {
                 this.sourceObj[source].close();
                 // 结束订阅，断开长链接
                 const httpRequest = new XMLHttpRequest();
-                httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}`, false);
+                httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}&alert=0`, false);
                 document.getElementById('img' + item.id).style.display = 'block';
                 document.getElementById(item.id).style.display = 'none';
                 let parent = document.getElementsByClassName('fatherBoxContent')[0];

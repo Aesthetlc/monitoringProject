@@ -2,7 +2,7 @@
     <div>
         <div class="container">
             <div id="tui-image-editor"></div>
-            <el-button type="primary" @click="uploadImg">完成并关闭</el-button>
+            <el-button style="margin-top:5px;margin-bottom:5px" type="primary" @click="uploadImg">完成并关闭</el-button>
         </div>
     </div>
 </template>
@@ -271,27 +271,32 @@ export default {
 
 <style scoped>
 .container {
+    padding: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 70vh;
-    /* text-align: center; */
+}
+
+/deep/ .tui-image-editor-container .tui-image-editor-main-container {
+    bottom: 0px !important;
 }
 
 .tui-image-editor-container {
     background-color: #fff;
 }
-.tui-image-editor {
-    padding-bottom: 56%;
+
+/deep/ .tui-image-editor-canvas-container {
     width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
     position: relative;
-    margin-top: 200px;
 }
+
 canvas {
     width: 100%;
     height: 100%;
+    background-color: aquamarine;
     position: absolute;
-    top: 0;
-    left: 0;
 }
 </style>

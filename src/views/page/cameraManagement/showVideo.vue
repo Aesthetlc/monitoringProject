@@ -28,7 +28,7 @@ export default {
     methods: {
         init() {
             // 开启订阅，建立长链接
-            this.source = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${this.showVideoObj.ip}`);
+            this.source = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${this.showVideoObj.ip}&alert=0`);
             // 接受消息
             this.source.onopen = function(event) {
                 console.log(event);
@@ -44,7 +44,7 @@ export default {
             this.source.close();
             // 结束订阅，断开长链接
             const httpRequest = new XMLHttpRequest();
-            httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${this.showVideoObj.ip}`, false);
+            httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${this.showVideoObj.ip}&alert=0`, false);
             // httpRequest.send();
 
             this.showVideoFlag = false;

@@ -72,7 +72,7 @@
                         </el-tooltip>
                     </template>
                 </el-table-column>
-                <el-table-column prop="ip" label="摄像机ip" align="center"></el-table-column>
+                <el-table-column prop="ip" label="摄像机ip" align="center" :show-overflow-tooltip="true"></el-table-column>
                 <el-table-column prop="position" label="摄像机位置" align="center">
                     <template slot-scope="scope">
                         <span>{{ scope.row.position | formatEmpty }}</span>
@@ -83,25 +83,31 @@
                         <span>{{ scope.row.fps | formatEmpty }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="currentNum" label="出入口" align="center" width="70">
+                <el-table-column prop="currentNum" label="初始化人数" align="center" width="70">
                     <template slot-scope="scope">
                         <span>{{ scope.row.currentNum | formatEmpty }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="pic" label="图像" align="center">
+                <el-table-column prop="pic" label="区域标注" align="center">
                     <template slot-scope="scope">
                         <el-image
                             v-if="scope.row.pic"
                             class="table-td-thumb"
-                            :src="scope.row.pic + '?' + Math.random()"
-                            :preview-src-list="[scope.row.pic + '?' + Math.random()]"
+                            :src="scope.row.pic + '?' + randomNum"
+                            :preview-src-list="[scope.row.pic + '?' + randomNum]"
                         ></el-image>
                         <span v-else>--</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="detectModelType" label="类别" align="center"></el-table-column>
+                <el-table-column prop="url" label="url" align="center" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.url | formatEmpty }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="detectModelType" label="类别" align="center" :show-overflow-tooltip="true"></el-table-column>
 
                 <el-table-column prop="state" label="状态" width="80" align="center">
                     <template slot-scope="scope">
@@ -119,6 +125,7 @@
                     label="创建时间"
                     align="center"
                     :formatter="dateFormat"
+                    :show-overflow-tooltip="true"
                 ></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
@@ -245,7 +252,8 @@ export default {
             endColor: '#00ff00', // 结束颜色
             showVideoFlag: false, // 视频查看弹窗开关
             importanceLevel: [], // 重要度等级
-            showVideoObj: '' //查看的信息
+            showVideoObj: '', //查看的信息
+            randomNum: 0
         };
     },
     computed: {},
@@ -255,6 +263,7 @@ export default {
         showVideo
     },
     created() {
+        this.randomNum = Math.random();
         //摄像头分页查询接口
         let searchObj = JSON.parse(JSON.stringify(this.form));
         searchObj.createTime = {};
@@ -474,6 +483,7 @@ export default {
         closeAddCameraDialog() {
             this.addCameraFlag = false;
             this.editCameraFlag = false;
+            this.randomNum = Math.random();
             this.resetForm('form');
         },
         // 关闭设置重要等级的弹窗

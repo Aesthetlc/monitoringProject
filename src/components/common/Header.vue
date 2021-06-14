@@ -72,7 +72,7 @@ export default {
                         this.sourceObj[source].close();
                         // 结束订阅，断开长链接
                         const httpRequest = new XMLHttpRequest();
-                        httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}`, false);
+                        httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}&alert=1`, false);
                         // 更新vuex里面的ipArr
                         this.updateMonitoringIpArr(item);
                         Cookies.set('monitoringIpArr', JSON.stringify(this.ipArr));

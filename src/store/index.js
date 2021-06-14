@@ -26,10 +26,11 @@ const store = new Vuex.Store({
         ipArr: [
             { id: 1, ip: '10.221.170.1', showFlag: false },
             { id: 2, ip: '10.221.170.2', showFlag: false },
-            { id: 3, ip: '10.221.170.3', showFlag: false },
-            { id: 4, ip: '10.221.170.4', showFlag: false },
-            { id: 5, ip: '10.221.170.5', showFlag: false },
-            { id: 6, ip: '10.221.170.6', showFlag: false }
+            { id: 3, ip: '10.221.170.4', showFlag: false },
+            { id: 4, ip: '10.221.170.5', showFlag: false },
+            { id: 5, ip: '10.221.170.6', showFlag: false },
+            { id: 6, ip: '10.221.170.7', showFlag: false },
+            { id: 7, ip: '10.221.170.8', showFlag: false }
         ],
         sourceObj: {}
     },

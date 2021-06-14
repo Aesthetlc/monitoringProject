@@ -15,6 +15,9 @@
                     <el-option v-for="item in importanceLevel" :key="item.id" :label="`等级${item.level}`" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item label="URL" prop="url">
+                <el-input v-model="ruleForm.url" placeholder="请输入url"></el-input>
+            </el-form-item>
             <el-form-item label="帧率" prop="fps">
                 <el-select style="width:100%" v-model="ruleForm.fps" placeholder="请选择视频流播放帧率">
                     <el-option label="8" value="8"></el-option>
@@ -29,7 +32,7 @@
             >
                 <el-input-number v-model="ruleForm.currentNum" :min="1" :max="999999" placeholder="请输入初始化人员"></el-input-number>
             </el-form-item>
-            <el-form-item v-if="ruleForm.modelType && ruleForm.modelType !== ''" label="区域选择">
+            <el-form-item v-if="showPic" label="区域选择">
                 <div v-if="ruleForm.pic !== ''" class="demo-image__placeholder">
                     <div class="block">
                         <el-image :src="ruleForm.pic">
@@ -42,19 +45,20 @@
                 </div>
             </el-form-item>
             <el-form-item style="text-align:center;margin-right:100px">
-                <el-button v-if="typeName === 'edit'" type="success" @click="resetImg()">重置图片</el-button>
+                <el-button v-if="typeName === 'edit' && showPic" type="success" @click="resetImg()">重置图片</el-button>
                 <el-button @click="closeDialog()">关闭</el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
             </el-form-item>
         </el-form>
-
-        <el-dialog append-to-body title="图片编辑" :visible.sync="dialogVisible" width="60%">
-            <editImg :imageUrl="imageUrl" @sendToData="sendToData"></editImg>
-            <!-- <span slot="footer" class="dialog-footer">
+        <div v-if="dialogVisible">
+            <el-dialog append-to-body title="图片编辑" :visible.sync="dialogVisible" width="60%">
+                <editImg :imageUrl="imageUrl" @sendToData="sendToData"></editImg>
+                <!-- <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
             </span> -->
-        </el-dialog>
+            </el-dialog>
+        </div>
     </div>
 </template>
 
@@ -100,7 +104,8 @@ export default {
                 fps: '', //帧率
                 currentNum: '', //初始化人员  （出入口/人流量计数）
                 pic: '', //缩略图
-                coord: [] //坐标数组
+                coord: [], //坐标数组
+                url: '' //url
             },
             detectModelId: '', //模型Id
             sendToDataTemp: {}, //编辑图片传过来的信息
@@ -112,13 +117,24 @@ export default {
                 position: [{ required: true, message: '请输入摄像头位置', trigger: 'blur' }],
                 importanceId: [{ required: true, message: '重要度不能为空', trigger: 'blur' }],
                 currentNum: [{ required: true, message: '房间初始化人数不能为空', trigger: 'blur' }],
-                fps: [{ required: true, message: '帧率不能为空', trigger: 'blur' }]
+                fps: [{ required: true, message: '帧率不能为空', trigger: 'blur' }],
+                url: [{ required: true, message: 'url不能为空', trigger: 'blur' }]
             },
-            importanceLevel: []
+            importanceLevel: [],
+            showPicArr: ['出入口', '安全通道占用', '危险区域闯入']
         };
     },
     components: {
         editImg
+    },
+    computed: {
+        showPic() {
+            let flag = false;
+            if (this.ruleForm.modelType && this.ruleForm.modelType !== '' && this.showPicArr.includes(this.ruleForm.modelType)) {
+                flag = true;
+            }
+            return flag;
+        }
     },
     mounted() {
         //获取全部等级（重要度）
@@ -142,8 +158,8 @@ export default {
         },
         // 子组件发送数据过来
         sendToData(obj) {
-            this.dialogVisible = false;
             this.sendToDataTemp = obj;
+            this.dialogVisible = false;
             this.ruleForm.pic = obj.imgUrl;
         },
         //编辑图片 获取图片base64
@@ -151,7 +167,7 @@ export default {
             let res = await getSrcFromCanvas(ip);
             if (res.code == 0) {
                 let url = res.detail;
-                this.imageUrl = url.substring(url.lastIndexOf('/') + 1);
+                this.imageUrl = url.substring(url.lastIndexOf('/') + 1) + '?' + Math.random();
             } else {
                 this.$message.error('获取图片地址失败');
             }
@@ -170,8 +186,13 @@ export default {
                     this.ruleForm.modelType = obj.detectModelType; // 这个字段算便写 编辑的时候  后台不会读取这个字段
                     this.ruleForm.fps = obj.fps;
                     this.ruleForm.currentNum = obj.currentNum;
-                    this.ruleForm.pic = obj.pic + '?' + Math.random();
+                    if (this.ruleForm.modelType && this.ruleForm.modelType !== '' && this.showPicArr.includes(this.ruleForm.modelType)) {
+                        this.ruleForm.pic = obj.pic + '?' + Math.random();
+                    } else {
+                        this.ruleForm.pic = '';
+                    }
                     this.ruleForm.coord = obj.coord;
+                    this.ruleForm.url = obj.url;
                     //回显等级
                     this.importanceLevel.forEach(item => {
                         if (item.name == obj.name) {
@@ -187,12 +208,17 @@ export default {
             this.$refs[formName].validate(async valid => {
                 if (valid) {
                     if (this.typeName === 'edit') {
-                        this.ruleForm.coord = this.sendToDataTemp.positionArr;
+                        this.ruleForm.coord = this.sendToDataTemp.positionArr ? this.sendToDataTemp.positionArr : this.ruleForm.coord;
+                        this.ruleForm.pic = this.sendToDataTemp.imgUrl ? this.sendToDataTemp.imgUrl : this.ruleForm.pic;
                         let obj = JSON.parse(JSON.stringify(this.ruleForm));
                         obj.coord = JSON.stringify(obj.coord);
                         obj.fps = parseInt(obj.fps);
                         obj.id = this.editRow.id;
-                        console.log(obj);
+                        for (let key in obj) {
+                            if (obj[key] == '') {
+                                obj[key] = null;
+                            }
+                        }
                         let res = await updateCameras(obj);
                         if (res.code == 0) {
                             this.$message({
@@ -210,6 +236,11 @@ export default {
                         obj.fps = parseInt(obj.fps);
                         delete obj.modelType;
                         obj.detectModelId = this.detectModelId;
+                        for (let key in obj) {
+                            if (obj[key] == '') {
+                                obj[key] = null;
+                            }
+                        }
                         let res = await addCameras(obj);
                         if (res.code == 0) {
                             this.$message({

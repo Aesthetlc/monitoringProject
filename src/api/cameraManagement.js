@@ -90,7 +90,8 @@ export function updateCameras(data) {
             coord:data.coord,
             currentNum:data.currentNum,
             fps:data.fps,
-            pic:data.pic
+            pic:data.pic,
+            url:data.url
         }
     });
 }

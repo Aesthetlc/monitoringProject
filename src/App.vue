@@ -46,7 +46,7 @@ export default {
                         this.sourceObj[source].close();
                         // 结束订阅，断开长链接
                         const httpRequest = new XMLHttpRequest();
-                        httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}`, false);
+                        httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}&alert=1`, false);
                         // 更新vuex里面的ipArr
                         this.updateMonitoringIpArr(item);
                         Cookies.set('monitoringIpArr', JSON.stringify(this.ipArr));
@@ -84,7 +84,7 @@ export default {
             this.ipArr.forEach(item => {
                 if (item.showFlag) {
                     let source = 'source' + item.id;
-                    let val = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${item.ip}`);
+                    let val = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${item.ip}&alert=1`);
                     this.updateSourceObj({ source, val });
                     this.sourceObj[source].onmessage = function(event) {
                         console.log('刷新的长连接', event);
