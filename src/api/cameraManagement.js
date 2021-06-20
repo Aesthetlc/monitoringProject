@@ -97,9 +97,14 @@ export function updateCameras(data) {
 }
 
 //获取编辑图片的url --0227
-export function getSrcFromCanvas(ip) {
+export function getSrcFromCanvas(cameraIp, modelType, cameraUrl) {
     return request({
-        url: `proxy/api/cameras/pic/${ip}`,
-        method: 'get'
+        url: `proxy/api/cameras/pic`,
+        method: 'post',
+        data: {
+            ip: cameraIp,
+            type: modelType,
+            url: cameraUrl
+        }
     });
 }

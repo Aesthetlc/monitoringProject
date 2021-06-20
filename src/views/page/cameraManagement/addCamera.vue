@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div v-else style="border:1px solid #C0C4CC;width:300px;height:150px;font-size:30px;text-align:center;line-height:150px;">
-                    <em @click="getSrcFromCanvas(ruleForm.ip)" style="cursor:pointer" class="el-icon-video-camera-solid"></em>
+                    <em @click="getSrcFromCanvas(ruleForm.ip, ruleForm.modelType, ruleForm.url)" style="cursor:pointer" class="el-icon-video-camera-solid"></em>
                 </div>
             </el-form-item>
             <el-form-item style="text-align:center;margin-right:100px">
@@ -154,7 +154,7 @@ export default {
         // 重置图片
         resetImg() {
             // this.ruleForm.pic = '';
-            this.getSrcFromCanvas(this.ruleForm.ip);
+            this.getSrcFromCanvas(this.ruleForm.ip, this.ruleForm.modelType, this.ruleForm.url);
         },
         // 子组件发送数据过来
         sendToData(obj) {
@@ -163,8 +163,8 @@ export default {
             this.ruleForm.pic = obj.imgUrl;
         },
         //编辑图片 获取图片base64
-        async getSrcFromCanvas(ip) {
-            let res = await getSrcFromCanvas(ip);
+        async getSrcFromCanvas(cameraIp, modelType, cameraUrl) {
+            let res = await getSrcFromCanvas(cameraIp, modelType, cameraUrl);
             if (res.code == 0) {
                 let url = res.detail;
                 this.imageUrl = url.substring(url.lastIndexOf('/') + 1) + '?' + Math.random();

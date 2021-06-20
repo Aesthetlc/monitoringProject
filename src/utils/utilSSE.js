@@ -13,6 +13,7 @@ let createSSE = (id) => {
         path = path.substring(0, path.indexOf('#'));
         // source = new EventSource(`http://8.141.53.8:8081/api/alert-events/subscribe?id=${id}`);
         source = new EventSource(`proxy/api/alert-events/subscribe?id=${id}`);
+        // source = new EventSource(`http://192.168.1.102:8081/proxy/api/alert-events/subscribe?id=${id}`);
 
         initSSE();
     } catch (e) {

@@ -50,7 +50,8 @@ export default {
                     document.getElementById(item.id).setAttribute('src', event.data);
                     document.getElementById('img' + item.id).style.display = 'none';
                     document.getElementById(item.id).style.display = 'block';
-                    let parent = document.getElementsByClassName('fatherBoxContent')[0];
+                    console.log(document.getElementsByClassName('fatherBoxContent'))
+                    let parent = document.getElementsByClassName('fatherBoxContent')[item.id - 1];
                     parent.getElementsByTagName('div')[0].className = 'boxContent';
                 };
                 // 更新vuex里面的ipArr
@@ -58,7 +59,6 @@ export default {
                 Cookies.set('monitoringIpArr', JSON.stringify(this.ipArr));
                 Cookies.set('sourceObj', JSON.stringify(this.sourceObj));
             } else {
-                console.log(this.sourceObj, source);
                 // 刷新报错 是因为sourceObj没有存  这个位置要修改下
                 this.sourceObj[source].close();
                 // 结束订阅，断开长链接
@@ -66,7 +66,7 @@ export default {
                 httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${item.ip}&alert=0`, false);
                 document.getElementById('img' + item.id).style.display = 'block';
                 document.getElementById(item.id).style.display = 'none';
-                let parent = document.getElementsByClassName('fatherBoxContent')[0];
+                let parent = document.getElementsByClassName('fatherBoxContent')[item.id - 1];
                 parent.getElementsByTagName('div')[0].className = 'boxIconContent';
                 // 更新vuex里面的ipArr
                 this.updateMonitoringIpArr(item);
