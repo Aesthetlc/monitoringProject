@@ -26,6 +26,12 @@ export default new Router({
                     meta: { title: '实时监控', role: ['admin', 'user'] }
                 },
                 {
+                    name: '监控展示',
+                    path: 'realTimeAlertShow',
+                    component: () => import('../views/page/realTimeAlertShow.vue'),
+                    meta: { title: '监控展示', role: ['admin', 'user'] }
+                },
+                {
                     name: '报警管理',
                     path: 'alarmManagement',
                     component: () => import('../views/page/alarmManagement'),

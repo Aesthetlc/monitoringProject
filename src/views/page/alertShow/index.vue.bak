@@ -1,0 +1,212 @@
+<template>
+    <div>
+        <div class="container">
+
+            <el-card v-if="type === 'realTimeMonitoring'" class="box-card">
+                <div slot="header">
+                    <span>监控图像</span>
+                </div>
+                <div class="warningImgBorder">
+                    <!-- key +10的原因 保证跟下方的暂无数据的key 不相同 -->
+                    <div class="desc" style="align-items: left; height: 100%; width: 20%; font-size: 30px;">
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                        场景描述
+                    </div>
+
+                    <div v-for="(item, index) in monitoringArr" :key="index + 10" class="warningImg" style="width: 80%;">
+                        <div style="width:50%;height:100%;display: flex;justify-content: space-between;align-items: center;">
+                            <el-image style="width: 100%; height: 80%" :src="item.img" fit="contain"></el-image>
+                        </div>
+                        <div style="width:50%">
+                            <p>位置:{{ item.location }}</p>
+                            <p>IP:{{ item.ip }}</p>
+                        </div>
+                    </div>
+                    <div v-for="(ite, ind) in 8 - monitoringArr.length" :key="ind + Math.random()" class="warningImg">
+                        <h1>暂无数据</h1>
+                    </div>
+                    <div v-for="(item, index) in monitoringArr" :key="index + 10" class="warningImg">
+                        <div style="width:50%;height:100%;display: flex;justify-content: space-between;align-items: center;">
+                            <el-image style="width: 100%; height: 80%" :src="item.img" fit="contain"></el-image>
+                        </div>
+                        <div style="width:50%">
+                            <p>位置:{{ item.location }}</p>
+                            <p>IP:{{ item.ip }}</p>
+                        </div>
+                    </div>
+                    <div v-for="(ite, ind) in 8 - monitoringArr.length" :key="ind + Math.random()" class="warningImg">
+                        <h1>暂无数据</h1>
+                    </div>
+
+                </div>
+            </el-card>
+        </div>
+    </div>
+</template>
+
+<script>
+import {
+    getAlertEventsState,
+    getAlertEventsQuery,
+    deleteAlertEventsById,
+    closeAlertEventsById,
+    deleteAlertEventsByArr,
+    querySymbolSize
+} from '@/api/alertEvents.js';
+import { mapState } from 'vuex';
+export default {
+    name: 'alertShow',
+    props: {
+        type: {
+            type: String,
+            default: ''
+        }
+    },
+    computed: {
+        ...mapState(['refreshBlank', 'monitoringArr'])
+    },
+    created() {
+    },
+    watch: {
+        // createTime: {
+        //     handler(newVal) {
+        //         let obj = {};
+        //         // obj.startTime = timeFormat(newVal[0]);
+        //         // obj.endTime = timeFormat(newVal[1]);
+        //         // console.log(obj);
+        //         obj.startTime = this.$util.timestampToDateTime(newVal[0]);
+        //         obj.endTime = this.$util.timestampToDateTime(newVal[1]);
+        //         this.form.createTime = obj;
+        //     }
+        // },
+        
+    },
+    mounted() {},
+    methods: {
+        
+    },
+    // keep-alive  进入
+    activated() {
+        
+    },
+    // keep-alive  离开
+    deactivated() {
+        
+    }
+};
+</script>
+
+<style scoped>
+.el-card {
+    height: 100%;
+}
+
+.handle-box {
+    margin-bottom: 20px;
+}
+
+.handle-select {
+    width: 120px;
+}
+
+.handle-input {
+    width: 300px;
+    display: inline-block;
+}
+.table {
+    width: 100%;
+    font-size: 14px;
+}
+.red {
+    color: #ff0000;
+}
+
+.warningImgBorder {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.warningImg {
+    border: 1px solid #999;
+    width: 24%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* /deep/ .el-card__header {
+    padding: 7px 10px;
+} */
+
+.mr10 {
+    margin-right: 10px;
+}
+.table-td-thumb {
+    display: block;
+    margin: auto;
+    width: 40px;
+    height: 40px;
+}
+
+/* ::v-deep .el-form-item label:after {
+        content: " ";
+        display: inline-block;
+        width: 100%;
+    }
+
+     ::v-deep .el-form-item__label {
+        text-align: justify
+    } */
+/* 这里去除必选字段的*,这个符号会造成一定影响,去掉之后我用了li列表进行定位,在前面加上" * ". */
+/* ::v-deep .el-form-item.is-required .el-form-item__label:before {
+        content: none !important;
+    } */
+.clearfix:after {
+    /*伪元素是行内元素 正常浏览器清除浮动方法*/
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {
+    *zoom: 1; /*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
+}
+.stateStyle {
+    height: 20px;
+    width: 20px;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+</style>

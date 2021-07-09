@@ -69,6 +69,14 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
+                    index: '/home/realTimeAlertShow',
+                    title: '实时监控展示',
+                    meta: {
+                        role: ['admin', 'user']
+                    }
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
                     index: '/home/alarmManagement',
                     title: '报警管理',
                     meta: {
@@ -94,7 +102,7 @@ export default {
                 {
                     icon: 'el-icon-lx-cascades',
                     index: '/home/monitoringShow',
-                    title: '监控查看',
+                    title: '实时视频查看',
                     meta: {
                         role: ['admin', 'user']
                     }

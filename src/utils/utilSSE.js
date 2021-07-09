@@ -61,12 +61,13 @@ let initSSE = () => {
 
         let mes = JSON.parse(e.data);
         
-        if (store.state.monitoringArr.length >= 8) {
+        if (store.state.monitoringArr.length >= 5) {
             store.commit('deleteMonitoringArr');
             store.commit('addMonitoringArr', mes);
         } else {
             store.commit('addMonitoringArr', mes);
         }
+        // console.log("timeValue: "+mes.timeValue)
     });
 
     /**

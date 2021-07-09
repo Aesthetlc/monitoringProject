@@ -44,6 +44,7 @@ export default {
             this.source.close();
             // 结束订阅，断开长链接
             const httpRequest = new XMLHttpRequest();
+            console.log('close live stream alert 0')
             httpRequest.open('GET', `proxy/api/live-stream/close?id=${this.userId}&ip=${this.showVideoObj.ip}&alert=0`, false);
             // httpRequest.send();
 

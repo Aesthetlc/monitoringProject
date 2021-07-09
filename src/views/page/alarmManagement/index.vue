@@ -9,10 +9,10 @@
                     <el-form-item label="摄像机位置" prop="position">
                         <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                     </el-form-item>
-                    <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                    <el-form-item label="摄像头类型筛选" prop="detectModelTypeArray">
                         <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
-                            <!-- <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
-                            </el-option> -->
+                            <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <!-- 实时监控 判断点 -->
@@ -49,12 +49,12 @@
                 style="height:200px;width:100%"
             ></echart>
 
-            <el-card v-if="type === 'realTimeMonitoring'" class="box-card">
+            <!-- <el-card v-if="type === 'realTimeMonitoring'" class="box-card">
                 <div slot="header">
                     <span>监控图像</span>
                 </div>
                 <div class="warningImgBorder">
-                    <!-- key +10的原因 保证跟下方的暂无数据的key 不相同 -->
+                    key +10的原因 保证跟下方的暂无数据的key 不相同
                     <div v-for="(item, index) in monitoringArr" :key="index + 10" class="warningImg">
                         <div style="width:50%;height:100%;display: flex;justify-content: space-between;align-items: center;">
                             <el-image style="width: 100%; height: 80%" :src="item.img" fit="contain"></el-image>
@@ -69,7 +69,7 @@
                         <h1>暂无数据</h1>
                     </div>
                 </div>
-            </el-card>
+            </el-card> -->
 
             <el-button type="danger" icon="el-icon-close" style="margin-bottom:10px" @click="delAllSelection" v-has="{ role: ['admin'] }"
                 >批量删除</el-button

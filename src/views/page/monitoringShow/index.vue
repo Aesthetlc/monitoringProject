@@ -46,7 +46,7 @@ export default {
                     console.log('连接创建open');
                 };
                 this.sourceObj[source].onmessage = function(event) {
-                    console.log('直接点击的长连接', event);
+                    // console.log('直接点击的长连接', event);
                     document.getElementById(item.id).setAttribute('src', event.data);
                     document.getElementById('img' + item.id).style.display = 'none';
                     document.getElementById(item.id).style.display = 'block';

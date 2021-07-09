@@ -87,7 +87,7 @@ export default {
                     let val = new EventSource(`proxy/api/live-stream/subscribe?id=${this.userId}&ip=${item.ip}&alert=1`);
                     this.updateSourceObj({ source, val });
                     this.sourceObj[source].onmessage = function(event) {
-                        console.log('刷新的长连接', event);
+                        // console.log('刷新的长连接', event);
                         document.getElementById(item.id).setAttribute('src', event.data);
                         document.getElementById('img' + item.id).style.display = 'none';
                         document.getElementById(item.id).style.display = 'block';

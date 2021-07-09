@@ -18,7 +18,7 @@
                         <el-form-item label="摄像机位置" prop="position">
                             <el-input style="width:150px" v-model="form.position" placeholder="请输入摄像机位置"></el-input>
                         </el-form-item>
-                        <el-form-item label="摄像头筛选" prop="detectModelTypeArray">
+                        <el-form-item label="摄像头类型筛选" prop="detectModelTypeArray">
                             <el-select style="width:150px" v-model="form.detectModelTypeArray" multiple placeholder="筛选条件">
                                 <el-option v-for="item in detectModelTypeArray" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
